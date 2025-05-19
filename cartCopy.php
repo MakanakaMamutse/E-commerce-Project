@@ -2,18 +2,6 @@
 // Include the database connection file
 
 session_start();
-// session_destroy();   // Destroys the session
-// session_start();     // Start a fresh session
-
-// To be converted to an empty cart funtion / stops session from being corrupted
-if(isset($_POST['reset_session'])) {
-    // Clear only the cart data, not the entire session
-    unset($_SESSION['cart']);
-    unset($_SESSION['cart_total']);
-    // Redirect to prevent resubmission
-    header("Location: cart.php");
-    exit();
-}
 
 
 
@@ -107,7 +95,9 @@ if(isset($_POST['reset_session'])) {
     //Updating the cart total
     getCartTotal();
 
-    
+    // Add this redirect to prevent the page from trying to display before session changes are fully processed
+    header("Location: cart.php");
+    exit();
   }
 
 
@@ -269,20 +259,16 @@ if(isset($_POST['reset_session'])) {
           <table>
             <tr>
               <td>Subtotal</td>
-              <td> <?php echo "$ " . number_format($_SESSION['cart_total'], 2);?> </td>
+              <td> <?php echo "$" . number_format($_SESSION['cart_total'], 2);?> </td>
             </tr>
             <tr>
               <td>Shipping</td>
-              <td><?php echo "$ " . number_format($_SESSION['cart_total'] * 0.0825, 2);?> </td>  
+              <td>R50.00</td>
           </table>
         </div>
 
         <div class="checkout-container">
-          <form method="POST" action="checkout.php">
-            <input type="hidden" name="cart_total" value="<?php echo $_SESSION['cart_total']; ?>">
-            <input type="submit" name="checkout" class="checkout-btn" value="Checkout">
-          </form>
-          <!-- <button class="checkout-btn">Checkout</button> -->
+          <button class="checkout-btn">Checkout</button>
 
         </div>
      </section>
@@ -355,9 +341,3 @@ if(isset($_POST['reset_session'])) {
   
   </body>
   </html>
-
-
-  <!-- <form method="POST" action="cart.php">
-    <input type="submit" name="reset_session" value="Reset Cart" class="btn btn-warning">
-  </form> --> 
-  <!-- to be added later as cart reset button -->
