@@ -1,6 +1,8 @@
 <?php
 // Include the database connection file
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
 // session_destroy();   // Destroys the session
 // session_start();     // Start a fresh session
@@ -121,9 +123,9 @@ if(isset($_POST['reset_session'])) {
 
 
   else{
-    // If the form is not submitted, redirect to the shop page
-    header("Location: index.php");
-    exit();
+    // If the form is not submitted, redirect to the shop page     ------- Later make it shop a cart with a messages of no items in the cart , add more logic
+    //header("Location: index.php");
+    //exit();
   }
 
 
@@ -183,7 +185,7 @@ if(isset($_POST['reset_session'])) {
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             
             <li class="nav-item">
-              <a class="nav-link" href="index.html">Home</a>
+              <a class="nav-link" href="index.php">Home</a>
             </li>
 
             <li class="nav-item">
@@ -199,8 +201,8 @@ if(isset($_POST['reset_session'])) {
             </li>
     
             <li class="nav-item">
-              <a href="cart.html"><i class="fas fa-shopping-bag"></i></a>
-              <a href="account.html"><i class="fas fa-user"></i></a>
+              <a href="cart.php"><i class="fas fa-shopping-bag"></i></a>
+              <a href="account.php"><i class="fas fa-user"></i></a>
             </li>
 
 

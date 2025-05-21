@@ -16,14 +16,6 @@ else {
 ?>
 
 
-
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,6 +42,7 @@ else {
 
   <!--Navbar-->
   <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 fixed-top">
+
         <div class="container-fluid">
           <img class="logo" src="assets/images/mLogo.png" alt="My shop">
           <h2 class="brand">M&M Sports</h2>
@@ -86,7 +79,9 @@ else {
         </div>
     </nav>
 
-  <!--Checkout-->
+  
+  
+    <!--Checkout-->
   <section class="my-5 py-5">
     <div class="container mt-5 py-5">
         <div class="row">
@@ -94,7 +89,7 @@ else {
                 <h2 class="text-center">Checkout</h2>
                 <hr class="mx-auto">
 
-                <form action="checkout.php" method="POST" class="shadow-lg p-4" id="checkout">
+                <form action="server/place_order.php" method="POST" class="shadow-lg p-4" id="checkout">
                     <div class="mb-3">
                         <label for="checkout-name" class="form-label">Full Name</label>
                         <input type="text" class="form-control" id="checkout-name" name="checkout-name" required>
@@ -149,15 +144,15 @@ else {
 
 
                     <div class="mb-4">
-                        <label for="checkout-payment" class="form-label">Payment Method</label>
+                        <label for="payment-method" class="form-label">Payment Method</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="checkout-payment" id="checkout-creditcard" value="credit-card" checked>
+                            <input class="form-check-input" type="radio" name="payment-method" id="checkout-creditcard" value="credit-card" checked>
                             <label class="form-check-label" for="checkout-creditcard">
-                                Credit Card
+                                Credit/Debit Card
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="checkout-payment" id="checkout-paypal" value="paypal">
+                            <input class="form-check-input" type="radio" name="payment-method" id="checkout-paypal" value="paypal">
                             <label class="form-check-label" for="checkout-paypal">
                                 PayPal
                             </label>
