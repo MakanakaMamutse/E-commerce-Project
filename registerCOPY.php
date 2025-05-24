@@ -1,3 +1,88 @@
+<?php
+
+session_start();
+
+// Database connection
+include('server/connection.php');
+
+
+  if(isset($_POST['register'])) {
+
+      // Get user input
+      $name = $_POST['name'];
+      $username = $_POST['username'];
+      $email = $_POST['email'];
+      $phone_number = $_POST['phone-number'];
+      $password = $_POST['password'];
+      $confirm_password = $_POST['confirm-password'];
+
+      $order_date   = date("Y-m-d H:i:s");
+
+      if($password !== $confirm_password) {
+          echo "Passwords do not match.";
+          exit();
+      }
+
+      else if(strlen($password) < 8) {
+          //echo "Password must be at least 8 characters long.";
+          header("Location: register.php?error=Password must be at least 8 characters long");
+          //exit();
+      }
+
+      //if there are no errors, proceed with registration
+      else {
+            // Hash the password
+          $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+          //Check if user already exists
+          $sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+          $stmt = $conn->prepare($sql);
+          $stmt->bind_param("s", $email);
+          $stmt->execute();
+          $stmt->bind_result($num_rows);
+          $stmt->store_result();
+          $stmt->fetch();
+          
+          //if user already exists, display error message
+          if($num_rows != 0) {
+              echo "User already exists.";
+              exit();
+          }//no user exists with that email, proceed with registration
+          else {
+          // Insert into database
+          $sql = "INSERT INTO users (full_name, username, email, phone_number, password, registration_date) 
+                    VALUES (?, ?, ?, ?, ?, ?)";
+
+          $stmt = $conn->prepare($sql);
+
+          $stmt->bind_param("ssssss", $name, $username, $email, $phone_number, $hashed_password, $order_date);
+
+          //when accoutn created succesfully
+          if($stmt->execute()) {
+
+            //Store user data in the session
+            $_SESSION['user_name']= $name;
+            $_SESSION['user_email']= $email;
+            $_SESSION['login_status']= true;
+              echo "Registration successful!";
+              header("Location: account.php");
+              exit();
+          } //account not created
+          else {
+              header("Location: register.php?error=Account not created");
+              echo "Error: " . $stmt->error;
+          }
+
+          $stmt->close();
+          $conn->close();
+        }
+      }
+
+    }
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,25 +138,43 @@
     </nav>
 
 
-    <!--Login-->
+    <!--Register-->
     <section class="my-5 py-5">
         <div class="container mt-5 py-5">
             <div class="row">
                 <div class="row-col-lg-6 col-md-6 col-sm-12 mx-auto">
-                    <h2 class="text-center">Login</h2>
+                    <h2 class="text-center">Register</h2>
                     <hr class="mx-auto">
-                    <form action="login.php" method="POST" class="shadow-lg p-4">
+                    <form action="register.php" method="POST" class="shadow-lg p-4">
+                      <p style="color: red;"><?php 
+                        if(isset($_GET['error'])){echo $_GET['error']; }; ?></p>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email address</label>
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone-number" class="form-label">Phone Number</label>
+                            <input type="phone" class="form-control" id="phone-number" name="phone-number" required>
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
-                        <button type="submit" class="login-btn">Login</button>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="password" name="confirm-password" required>
+                        </div>
+                        <button type="submit" class="register-btn" id="register-btn" name="register">Register</button>
                         <div class="mt-3 text-center">
-                            <small>Don't have an account? <a href="register.php">Register here</a></small>
+                            <small>Do you have an account? <a href="login.html">Login here</a></small>
                         </div>
                     </form>
                 </div>

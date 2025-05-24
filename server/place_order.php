@@ -21,15 +21,15 @@ include_once 'connection.php';
         $country          = $_POST['checkout-country'];
         $payment_method   = $_POST['payment-method']; // Matches HTML <input name="payment-method">
 
-        // Hardcoded IDs for now (will be dynamic in a full application).
-        $customer_id = 1;
+        // Hardcoded IDs for now (will be dynamic in a full application) user id set.
+        $customer_id = $_SESSION['user_id']; 
         $seller_id   = 2; // Required as 'seller_id' is NOT nullable in your DB.
         $payment_id  = null; // Set to null as payment processing is not yet implemented (DB column is nullable).
 
 
         // --- Calculate Order Financials ---
         // Assuming $_SESSION['cart_total'] holds the base product subtotal.
-        $subtotal_amount = $_SESSION['cart_total'];
+        $subtotal_amount = round($_SESSION['cart_total'], 2);
 
         // Calculate shipping cost and round to two decimal places.
         $shipping_cost = round($subtotal_amount * 0.0825, 2);

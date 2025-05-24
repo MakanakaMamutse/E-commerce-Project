@@ -273,7 +273,7 @@ INSERT INTO products (seller_id, category_id, product_name, description, price) 
 (1, 5, 'Puma Future Ultimate', 'Innovative Puma boots with adaptable FUZIONFIT+ compression band for customizable fit. Features dynamic motion system for agility.', 239.99),
 (1, 5, 'Puma Ultra Ultimate', 'Ultra-lightweight Puma speed boots weighing just 175g. Features ULTRAWEAVE upper for minimal weight with maximum durability.', 229.99),
 (2, 5, 'Puma King Ultimate', 'Modern version of the classic Puma King with premium K-leather upper. Offers exceptional comfort and touch on the ball.', 199.99),
-(2, 5, 'Puma Future Z 3.4', 'Affordable version of Puma\'s Future silo with adaptive FitZone for comfortable fit. Ideal for amateur players on artificial surfaces.', 89.99),
+(2, 5, 'Puma Future Z 3.4', 'Affordable version of Puma''s Future silo with adaptive FitZone for comfortable fit. Ideal for amateur players on artificial surfaces.', 89.99),
 (2, 5, 'Puma Ultra 3.4', 'Budget-friendly speed boots with lightweight synthetic upper. Features molded studs optimized for firm ground surfaces.', 79.99);
 
 -- Insert additional products - Gear (replaces Shin Pads)
@@ -344,3 +344,64 @@ INSERT INTO product_images (product_id, image_url) VALUES
 UPDATE product_images 
 SET image_url = REPLACE(image_url, 'images/shin-pads/', 'images/gear/') 
 WHERE image_url LIKE '%images/shin-pads/%';
+
+
+
+
+
+
+
+
+
+
+
+
+Added more data 2 add db columns to add more complexity:
+
+
+-- 1. Add full_name column to users table
+ALTER TABLE users ADD COLUMN full_name VARCHAR(100);
+
+-- 2. Update existing users with sample full names
+-- This creates sample names based on usernames to populate the new column
+UPDATE users
+SET full_name = CONCAT(
+    UPPER(SUBSTRING(username, 1, 1)), 
+    LOWER(SUBSTRING(username, 2)), 
+    ' ', 
+    UPPER(SUBSTRING(REVERSE(username), 1, 1)), 
+    LOWER(SUBSTRING(REVERSE(username), 2))
+)
+WHERE full_name IS NULL;
+
+-- 3. Enhance the orders table with additional columns
+ALTER TABLE orders 
+ADD COLUMN payment_method VARCHAR(50),
+ADD COLUMN payment_id INT,
+ADD COLUMN tax_amount DECIMAL(10,2),
+ADD COLUMN subtotal DECIMAL(10,2);  
+
+
+
+-- Add missing columns to orders table for customer info
+ALTER TABLE orders 
+ADD COLUMN full_name VARCHAR(100),
+ADD COLUMN email VARCHAR(100),
+ADD COLUMN phone_number VARCHAR(20),
+ADD COLUMN shipping_address VARCHAR(255),
+ADD COLUMN city VARCHAR(100),
+ADD COLUMN state_province VARCHAR(100),
+ADD COLUMN zip_postal_code VARCHAR(20),
+ADD COLUMN country VARCHAR(100),
+ADD COLUMN payment_method VARCHAR(50),
+ADD COLUMN payment_id INT,
+ADD COLUMN tax_amount DECIMAL(10,2),
+ADD COLUMN subtotal DECIMAL(10,2);
+
+-- Note: If your orders table already has some of these columns (like shipping_address),
+-- you would want to skip those in the ALTER TABLE statement above.
+
+
+-- Add subtotal column to order_items table
+ALTER TABLE order_items 
+ADD COLUMN subtotal DECIMAL(10,2);

@@ -51,7 +51,7 @@
      
               <li class="nav-item">
                 <a href="cart.php"><i class="fas fa-shopping-bag"></i></a>
-                <a href="account.html"><i class="fas fa-user"></i></a>
+                <a href="account.php"><i class="fas fa-user"></i></a>
               </li>
 
 

@@ -1,0 +1,424 @@
+<?php
+/**
+ * Account Management Page
+ * Handles user authentication, logout, and password changes
+ */
+
+// Start the session
+session_start();
+
+// Include database connection file
+include('server/connection.php');
+
+// Check if the user is logged in
+if (!isset($_SESSION['login_status'])) {
+    // User is not logged in, redirect to the login page
+    header("Location: login.php");
+    exit();
+}
+
+// Initialize variables for form data and errors
+$errors = [];
+$success_message = '';
+
+// Handle user logout functionality
+if (isset($_GET['logout'])) {
+    if(isset($_SESSION['login_status'])) {
+        // Unset specific session variables instead of destroying entire session
+        unset($_SESSION['login_status']);
+        unset($_SESSION['username']);
+        unset($_SESSION['useremail']);
+        unset($_SESSION['email']);
+
+        // Redirect to login page after logout
+        header("Location: login.php");
+        exit();
+    }
+}
+
+/**
+ * Password Change Form Processing
+ * Validates input and updates user password in database
+ */
+if (isset($_POST['change-password'])) {
+    // Sanitize input data
+    $new_password = trim($_POST['new-password']);
+    $confirm_password = trim($_POST['confirm-password']);
+    $user_email = $_SESSION['email'];
+
+    // Validate new password field
+    if (empty($new_password)) {
+        $errors['new_password'] = "New password is required.";
+    }
+    
+    if (strlen($new_password) < 8) {
+        $errors['new_password'] = "Password must be at least 8 characters long.";
+    }
+    
+    // Check for password complexity (at least one number and one letter)
+    if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d)/', $new_password)) {
+        $errors['new_password'] = "Password must contain at least one letter and one number.";
+    }
+    
+    // Validate confirm password field
+    if (empty($confirm_password)) {
+        $errors['confirm_password'] = "Please confirm your password.";
+    }
+    
+    if ($new_password !== $confirm_password) {
+        $errors['confirm_password'] = "Passwords do not match.";
+    }
+
+    // Process password update if no validation errors
+    if (empty($errors)) {
+        // Hash the new password securely
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        
+        // Prepare SQL statement to prevent SQL injection
+        $updatePasswordQuery = "UPDATE users SET password = ? WHERE email = ?";
+        $stmt = $conn->prepare($updatePasswordQuery);
+        
+        // Check if the statement was prepared successfully
+        if ($stmt) {
+            // Bind parameters and execute query
+            $stmt->bind_param("ss", $hashed_password, $user_email);
+            
+            if ($stmt->execute()) {
+                // Check if any rows were actually updated
+                if ($stmt->affected_rows > 0) {
+                    $success_message = "Password changed successfully!";
+                    // Clear POST data to prevent form resubmission issues
+                    $_POST = [];
+                } 
+                else {
+                    $errors['general'] = "No changes were made. Please try again.";
+                }
+            }
+             else {
+                $errors['general'] = "Database error occurred. Please try again.";
+            }
+            $stmt->close();
+        } 
+        else {
+            $errors['general'] = "Failed to prepare database query. Please try again.";
+        }
+    }
+}
+
+
+?>
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous"/>
+
+    <link rel="stylesheet" href="assets/css/style.css"/>
+
+</head>
+
+<body>
+
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 fixed-top">
+      <div class="container-fluid">
+        <img class="logo" src="assets/images/mLogo.png" alt="My shop">
+        <h2 class="brand">M&M Sports</h2>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse nav-buttons" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            
+            <li class="nav-item">
+              <a class="nav-link" href="index.php">Home</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="shop.html">Shop</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="#">Blog</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contact Us</a>
+            </li>
+    
+            <li class="nav-item">
+              <a href="cart.php"><i class="fas fa-shopping-bag"></i></a>
+              <a href="account.php"><i class="fas fa-user"></i></a>
+            </li>
+
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
+   <!--Account Page-->
+<section class="my-5 py-5">
+    <div class="row container mx-auto">
+        <div class="text-center mt-3 pt-5 col-lg-6 col-md-12 col-sm-12">
+            <h3>Account Info</h3>
+            <hr class="mx-auto">
+            <div class="account-info">
+                <p>Name: <span> <?php echo htmlspecialchars($_SESSION['username']); ?> </span></p>
+                <p>Email: <span> <?php echo htmlspecialchars($_SESSION['email']); ?> </span></p>
+                <p><a href="#orders" id="order-btn">Your Orders</a></p>
+                <p><a href="account.php?logout=1" id="logout-btn">Logout</a></p>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-12 col-sm-12">
+            <!-- Success Message Display -->
+            <?php if (!empty($success_message)): ?>
+                <div class="alert alert-success text-center" role="alert">
+                    <strong>Success!</strong> <?php echo htmlspecialchars($success_message); ?>
+                </div>
+            <?php endif; ?>
+            
+            <!-- General Error Message Display -->
+            <?php if (isset($errors['general'])): ?>
+                <div class="alert alert-danger text-center" role="alert">
+                    <strong>Error:</strong> <?php echo htmlspecialchars($errors['general']); ?>
+                </div>
+            <?php endif; ?>
+            
+            <form id="account-form" method="POST" action="account.php">
+                <h3>Change Password</h3>
+                <hr class="mx-auto">
+                
+                <!-- New Password Field -->
+                <div class="mb-3">
+                    <label for="new-password" class="form-label">New Password</label>
+                    <input type="password" 
+                           class="form-control <?php echo isset($errors['new_password']) ? 'is-invalid' : ''; ?>" 
+                           id="new-password" 
+                           name="new-password" 
+                           placeholder="Enter new password"
+                           required>
+                    <?php if (isset($errors['new_password'])): ?>
+                        <div class="invalid-feedback">
+                            <?php echo htmlspecialchars($errors['new_password']); ?>
+                        </div>
+                    <?php endif; ?>
+                    <div class="form-text">
+                        Password must be at least 8 characters with letters and numbers.
+                    </div>
+                </div>
+
+                <!-- Confirm Password Field -->
+                <div class="mb-3">
+                    <label for="account-password-confirm" class="form-label">Confirm Password</label>
+                    <input type="password" 
+                           class="form-control <?php echo isset($errors['confirm_password']) ? 'is-invalid' : ''; ?>" 
+                           id="account-password-confirm" 
+                           name="confirm-password" 
+                           placeholder="Confirm new password"
+                           required>
+                    <?php if (isset($errors['confirm_password'])): ?>
+                        <div class="invalid-feedback">
+                            <?php echo htmlspecialchars($errors['confirm_password']); ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <div class="form-group mt-2">
+                    <input type="submit" 
+                           class="btn btn-primary" 
+                           id="change-password-btn" 
+                           name="change-password" 
+                           value="Change Password">
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+
+        <!--Cart Section-->  
+    <section id="order" class="cart container my-5 py-5">
+          <div class="container mt-5">
+              <h2 class="font-weight-bolde">Your Orders</h2>
+              <hr>
+          </div>
+          <table class="mt-5 pt-5">
+              <tr>
+                  <th>Product</th>
+                  <th>Date</th>
+              </tr>
+              <tr>
+                  <td>
+                      <div class="product-info">
+                        <img src="assets\images\club-shirts\man-city-home-2024.png" alt="Product Image">
+                        <div>
+                            <p>Footbal Shirt</p>
+                            <small>Price: $50.00</small><br>
+                            <a href="#">Remove</a>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <input type="number" value="1" min="1">
+                    <a class="edit-btn" href="#">Edit</a>
+                  </td>
+  
+                  <td>
+                    <span>$</span>
+                    <span class="product-price">50.00</span>
+                  </td>
+              </tr>
+  
+              <!-- Repeat for other products -->
+  
+              <tr>
+                <td>
+                    <div class="product-info">
+                        <img src="assets/images/top4.png" alt="Product Image">
+                        <div>
+                            <p>Footbal Shirt</p>
+                            <small>Price: $50.00</small><br>
+                            <a href="#">Remove</a>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                  <input type="number" value="1" min="1">
+                  <a class="edit-btn" href="#">Edit</a>
+                </td>
+  
+                <td>
+                  <span>$</span>
+                  <span class="product-price">50.00</span>
+                </td>
+            </tr>
+  
+            <!-- Repeat for other products -->
+  
+            <tr>
+              <td>
+                  <div class="product-info">
+                      <img src="assets/images/top4.png" alt="Product Image">
+                      <div>
+                          <p>Footbal Shirt</p>
+                          <small>Price: $50.00</small><br>
+                          <a href="#">Remove</a>
+                      </div>
+                  </div>
+              </td>
+              <td>
+                <input type="number" value="1" min="1">
+                <a class="edit-btn" href="#">Edit</a>
+              </td>
+  
+              <td>
+                <span>$</span>
+                <span class="product-price">50.00</span>
+              </td>
+          </tr>
+          </table>
+  
+          <div class="cart-total">
+            <table>
+              <tr>
+                <td>Subtotal</td>
+                <td>R150.00</td>
+              </tr>
+              <tr>
+                <td>Shipping</td>
+                <td>R50.00</td>
+            </table>
+          </div>
+  
+          <div class="checkout-container">
+            <button class="checkout-btn">Checkout</button>
+  
+          </div>
+    </section>
+
+
+
+
+    <!--Footer-->
+    <footer class="mt-5 py-5">
+
+        <div class="row container mx-auto py-5">
+          <div class="footer-one col-lg-3 col-md-6 col-sm-12">
+            <img src="assets/images/yy.png"/>
+            <p class="pt-3">We provide the best products</p>
+          </div>
+  
+          <div class="footer-one col-lg-3 col-md-6 col-sm-12">
+            <h5 class="pt-2">Featured</h5>
+            <ul class="text-uppercase">
+              <li><a href="#">Shoes</a></li>
+              <li><a href="#">Shirts</a></li>
+              <li><a href="#">Gear</a></li>
+            </ul>
+          </div>
+  
+          <div class="footer-one col-lg-3 col-md-6 col-sm-12">
+            <h5 class="pt-2">Contact Us</h5>
+            <div> 
+              <h6 class="text-uppercase">Address</h6>
+              <p>1234 Street Name</p>
+            </div>
+            <div> 
+              <h6 class="text-uppercase">Phone</h6>
+              <p>00 00 XXX</p>
+            </div>
+            <div> 
+              <h6 class="text-uppercase">Email</h6>
+              <p>dummy@mail.com</p>
+            </div>>
+          </div>
+  
+          <div class="footer-one col-lg-3 col-md-6 col-sm-12">
+            <h5 class="pb-2">Instagram</h5>
+            <div class="row">
+              <img class="img-fluid w-25 h-100 m-2" src="assets/images/featured1.jpg"/>
+              <img class="img-fluid w-25 h-100 m-2" src="assets/images/featured2.jpg"/>
+              <img class="img-fluid w-25 h-100 m-2" src="assets/images/featured3.jpg"/>
+  
+          </div>
+        </div>
+  
+        <div class="copyright mt-5">
+          <div class ="row container mx-auto">
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+              <img src="assets/images/payment.png" alt="My Shop" height="40"> <!--Payjpg-->
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4 text-nowrap mb-2">
+              <p>&copy; 2025 My Shop. All Rights Reserved</p>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-4">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+          </div>
+        </div>
+  
+      </footer>
+  
+  
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  
+  </body>
+  </html>
