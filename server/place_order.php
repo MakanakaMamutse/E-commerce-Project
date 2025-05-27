@@ -8,6 +8,14 @@ include_once 'connection.php';
 
     if(isset($_POST['place_order'])) {
 
+
+        // In your PHP
+        if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+            header("Location: ../login.php?login_required=1");
+            exit();
+        }
+
+
         // --- Get User Info and Order Details from Form and Session ---
         // Mapping $_POST data to PHP variables, aligning with database column names.
         // Updated to match the 'name' attributes in your HTML form (e.g., 'checkout-name').
@@ -202,8 +210,8 @@ include_once 'connection.php';
     } else {
         // If the script was accessed without a form submission (e.g., direct URL access).
         // Consider redirecting to the checkout page.
-        // header("Location: checkout.php");
-        // exit();
+        header("Location: login.php");
+        exit();
     }
     
     

@@ -105,6 +105,33 @@ if (isset($_POST['change-password'])) {
     }
 }
 
+// Check if the user is logged in and then retrieve order history
+if (isset($_SESSION['login_status'])) {
+    // Prepare SQL statement to fetch user orders
+    $user_email = $_SESSION['email'];
+    $orderQuery = "SELECT * FROM orders WHERE email = ? ORDER BY order_date DESC";
+    $stmt = $conn->prepare($orderQuery);
+    
+    // Check if the statement was prepared successfully
+    if ($stmt) {
+        // Bind parameters and execute query
+        $stmt->bind_param("s", $user_email);
+        $stmt->execute();
+        
+        // Fetch results
+        $orders = $stmt->get_result();
+        
+        // Close the statement
+        $stmt->close();
+    } else {
+        $errors['general'] = "Failed to retrieve orders. Please try again.";
+    }
+} else {
+    // If not logged in, redirect to login page
+    header("Location: login.php");
+    exit();
+}
+
 
 ?>
 
@@ -252,105 +279,118 @@ if (isset($_POST['change-password'])) {
 
 
 
-        <!--Cart Section-->  
-    <section id="order" class="cart container my-5 py-5">
-          <div class="container mt-5">
-              <h2 class="font-weight-bolde">Your Orders</h2>
-              <hr>
-          </div>
-          <table class="mt-5 pt-5">
-              <tr>
-                  <th>Product</th>
-                  <th>Date</th>
-              </tr>
+ <!--Orders Section-->  
+<section id="order" class="cart container my-5 py-5">
+      <div class="container mt-5">
+          <h2 class="font-weight-bold">Your Orders</h2>
+          <hr>
+      </div>
+      <table class="mt-5 pt-5">
+          <tr>
+              <th>OrderID</th>
+              <th>Order Status</th>
+              <th>Date</th>
+              <th>Quantity</th>
+              <th>Order Cost</th>
+          </tr>
+
+          <?php while ($row = $orders->fetch_assoc()) { ?>
               <tr>
                   <td>
                       <div class="product-info">
-                        <img src="assets\images\club-shirts\man-city-home-2024.png" alt="Product Image">
-                        <div>
-                            <p>Footbal Shirt</p>
-                            <small>Price: $50.00</small><br>
-                            <a href="#">Remove</a>
+                        <img src="assets\images\OrderID.png" alt="Product Image">
+                        <div class="font-weight-bold">
+                            <br>
+                            <p> <?php echo $row['order_id']; ?> </p>
+                            <a href="order_details.php?order_id=<?php echo htmlspecialchars($row['order_id']); ?>">Details</a>
                       </div>
                     </div>
+                  </td>
+                  <td>
+                    <span class="order-date"> <?php echo $row['order_status']; ?> </span>
+                  </td>
+                  <td>
+                    <span class="order-date"> <?php echo $row['order_date']; ?> </span>
                   </td>
                   <td>
                     <input type="number" value="1" min="1">
                     <a class="edit-btn" href="#">Edit</a>
                   </td>
-  
                   <td>
                     <span>$</span>
-                    <span class="product-price">50.00</span>
+                    <span class="product-price"><?php echo $row['total_amount']; ?></span>
                   </td>
               </tr>
-  
-              <!-- Repeat for other products -->
-  
-              <tr>
-                <td>
-                    <div class="product-info">
-                        <img src="assets/images/top4.png" alt="Product Image">
-                        <div>
-                            <p>Footbal Shirt</p>
-                            <small>Price: $50.00</small><br>
-                            <a href="#">Remove</a>
-                        </div>
+
+          <?php } ?>
+
+          <!-- Repeat for other products
+
+          <tr>
+            <td>
+                <div class="product-info">
+                    <img src="assets/images/top4.png" alt="Product Image">
+                    <div>
+                        <p>Footbal Shirt</p>
+                        <small>Price: $50.00</small><br>
+                        <a href="#">Remove</a>
                     </div>
-                </td>
-                <td>
-                  <input type="number" value="1" min="1">
-                  <a class="edit-btn" href="#">Edit</a>
-                </td>
-  
-                <td>
-                  <span>$</span>
-                  <span class="product-price">50.00</span>
-                </td>
-            </tr>
-  
-            <!-- Repeat for other products -->
-  
-            <tr>
-              <td>
-                  <div class="product-info">
-                      <img src="assets/images/top4.png" alt="Product Image">
-                      <div>
-                          <p>Footbal Shirt</p>
-                          <small>Price: $50.00</small><br>
-                          <a href="#">Remove</a>
-                      </div>
+                </div>
+            </td>
+            <td>
+              <input type="number" value="1" min="1">
+              <a class="edit-btn" href="#">Edit</a>
+            </td>
+
+            <td>
+              <span>$</span>
+              <span class="product-price">50.00</span>
+            </td>
+        </tr>
+
+         Repeat for other products 
+
+        <tr>
+          <td>
+              <div class="product-info">
+                  <img src="assets/images/top4.png" alt="Product Image">
+                  <div>
+                      <p>Footbal Shirt</p>
+                      <small>Price: $50.00</small><br>
+                      <a href="#">Remove</a>
                   </div>
-              </td>
-              <td>
-                <input type="number" value="1" min="1">
-                <a class="edit-btn" href="#">Edit</a>
-              </td>
-  
-              <td>
-                <span>$</span>
-                <span class="product-price">50.00</span>
-              </td>
+              </div>
+          </td>
+          <td>
+            <input type="number" value="1" min="1">
+            <a class="edit-btn" href="#">Edit</a>
+          </td>
+
+          <td>
+            <span>$</span>
+            <span class="product-price">50.00</span>
+          </td>
+      </tr> -->
+
+      </table>
+
+      <div class="cart-total">
+        <table>
+          <tr>
+            <td>Subtotal</td>
+            <td>R150.00</td>
           </tr>
-          </table>
-  
-          <div class="cart-total">
-            <table>
-              <tr>
-                <td>Subtotal</td>
-                <td>R150.00</td>
-              </tr>
-              <tr>
-                <td>Shipping</td>
-                <td>R50.00</td>
-            </table>
-          </div>
-  
-          <div class="checkout-container">
-            <button class="checkout-btn">Checkout</button>
-  
-          </div>
-    </section>
+          <tr>
+            <td>Shipping</td>
+            <td>R50.00</td>
+        </table>
+      </div>
+
+      <div class="checkout-container">
+        <button class="checkout-btn">Checkout</button>
+
+      </div>
+</section>
 
 
 
@@ -415,7 +455,7 @@ if (isset($_POST['change-password'])) {
           </div>
         </div>
   
-      </footer>
+    </footer>
   
   
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

@@ -1,7 +1,7 @@
 <?php
 
 
-$conn = mysqli_connect("localhost", "root", "", "phpproject") or die("Connection failed: " . mysqli_connect_error());
+$conn = mysqli_connect("localhost", "root", "", "ecommercedb") or die("Connection failed: " . mysqli_connect_error());
 
 
 ?>

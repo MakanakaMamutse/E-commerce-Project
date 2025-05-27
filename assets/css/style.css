@@ -375,7 +375,7 @@ footer .copyright .img{
 
 
 
-/* Cart Section */
+/* Cart Section - Account orders*/
 
 .cart table {
     width: 100%;
@@ -398,7 +398,7 @@ footer .copyright .img{
 .cart td {
     padding: 10px 20px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #c9bdbd;
 }
 
 .cart td img {
@@ -455,6 +455,8 @@ footer .copyright .img{
     cursor: pointer;
     text-decoration: none;
 }
+
+/* Account Section */
 
 td:last-child{
     text-align: right;
