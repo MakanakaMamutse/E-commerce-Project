@@ -124,8 +124,9 @@ if(isset($_POST['reset_session'])) {
 
   else{
     // If the form is not submitted, redirect to the shop page     ------- Later make it shop a cart with a messages of no items in the cart , add more logic
-    //header("Location: index.php");
-    //exit();
+    // header("Location: login.php");
+    // exit();
+    
   }
 
 

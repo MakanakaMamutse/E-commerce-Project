@@ -48,7 +48,7 @@ include_once 'connection.php';
 
 
         // --- Set Other Order Specific Details ---
-        $order_status = "pending"; // Default status for a new order.
+        $order_status = "Unpaid"; // Default status for a new order.
         $order_date   = date("Y-m-d H:i:s"); // Current date and time of the order.
 
 

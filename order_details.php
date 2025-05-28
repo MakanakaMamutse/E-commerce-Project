@@ -28,9 +28,11 @@
           exit();
       }
 
+      // Extract order status
+      $order_status = $order_info['order_status'];
+
       // Prepare the SQL statement for order items with joins
-      $sql_order_items_details = "
-          SELECT
+      $sql_order_items_details = " SELECT
               oi.quantity,
               p.product_name,
               p.price AS current_product_price,
@@ -126,8 +128,13 @@
         <?php } ?>
     </table>
 
-    <!-- Display additional order information -->
-    
+  <!-- Display additional order information -->
+    <?php if ($order_info['order_status'] === 'Unpaid'): ?>
+      <div class="mt-4" style="text-align: right;">
+          <a href="payment.php?order_id=<?php echo htmlspecialchars($order_id); ?>&order_status=<?php echo htmlspecialchars($order_info['order_status']); ?>" 
+            class="btn btn-primary btn-lg">Pay Now</a>
+      </div>
+    <?php endif; ?>
 
 </section>
 

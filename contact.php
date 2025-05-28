@@ -27,7 +27,7 @@
         }
 
         .hero-section {
-            background: linear-gradient(135deg, #667eea 0%,rgb(13, 40, 196) 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 120px 0 80px;
             color: white;
             position: relative;
@@ -114,6 +114,14 @@
             font-size: 16px;
             transition: all 0.3s ease;
             background: #f8f9fa;
+            min-height: 56px;
+        }
+
+        .form-control select,
+        .form-select {
+            padding: 15px 20px;
+            height: 56px;
+            line-height: 1.5;
         }
 
         .form-control:focus {
@@ -430,7 +438,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="subject" class="form-label">Subject</label>
-                                <select class="form-control" id="subject" required>
+                                <select class="form-control form-select" id="subject" required>
                                     <option value="">Select a subject</option>
                                     <option value="general">General Inquiry</option>
                                     <option value="support">Customer Support</option>
