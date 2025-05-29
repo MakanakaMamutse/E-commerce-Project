@@ -1,0 +1,161 @@
+/* Global Styles - Base styles used across all pages */
+
+/* CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Typography */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+h5 {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+h6 {
+    font-size: 1rem;
+    font-weight: 400;
+    color: rgb(0, 0, 0);
+}
+
+/* Base Button Styles */
+button {
+    font-size: 1rem;
+    font-weight: 900;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    transition: 1s ease;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #ff0505;
+    color: white;
+}
+
+/* Navbar Styles */
+.navbar {
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    top: 0;
+    left: 0;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.9);
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    background-color: black;
+    border-radius: 50%;
+    margin-left: 70px;
+}
+
+.navbar .brand {
+    color: rgb(0, 0, 0);
+    margin: 0px 5px;
+    font-size: 1.5rem;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    padding: 0 20px;
+    color: black;
+    transition: 0.4s ease;
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar i:hover,
+.navbar-light .navbar-nav .nav-link.active,
+.navbar i.active {
+    color: #ff0505;
+}
+
+.navbar i {
+    font-size: 1.2rem;
+    padding: 0 0.7px;
+    transition: 0.4s ease;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #333;
+}
+
+footer h5 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bolder;
+}
+
+footer li {
+    padding-bottom: 4px;
+}
+
+footer li a {
+    color: white;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
+footer li a:hover {
+    transition: 0.3s ease;
+    color: #ff0505;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+footer .copyright a {
+    color: black;
+    background-color: white;
+    height: 40px;
+    width: 40px;
+    display: inline-block;
+    text-align: center;
+    line-height: 40px;
+    border-radius: 50%;
+    transition: 0.9s ease;
+    margin: 0 5px;
+}
+
+footer .copyright a:hover {
+    background-color: #ff0505;
+    color: white;
+}
+
+footer p {
+    color: white;
+}
+
+footer .copyright .img {
+    width: 20px;
+    height: 20px;
+}

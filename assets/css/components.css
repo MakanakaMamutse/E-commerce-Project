@@ -1,0 +1,85 @@
+/* Components - Reusable UI elements */
+
+/* Navigation Buttons */
+.nav-buttons {
+    margin-left: 55%;
+}
+
+/* Buy Button Component */
+a.buy-btn {
+    display: inline-block;
+    background-color: #3f3938;
+    color: white !important;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none !important;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 10px 0;
+}
+
+a.buy-btn:hover {
+    background-color: #e64a19;
+    text-decoration: none !important;
+}
+
+/* Form Components */
+.form-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #000000;
+    text-align: center;
+    display: block;
+}
+
+.form-control {
+    height: 50px;
+    color: #000000;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 5px;
+    border: 1px solid #707070;
+}
+
+/* Button Variants */
+.login-btn {
+    background-color: #2a61d8;
+    color: aliceblue;
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.register-btn {
+    background-color: #2a61d8;
+    color: aliceblue;
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.checkout-btn {
+    background-color: #2a61d8;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+/* Utility Components */
+hr.mx-auto {
+    background-color: blue;
+    height: 2px;
+    border: none;
+}
+
+.mt-3 small {
+    color: black;
+    font-weight: bold;
+}

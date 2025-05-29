@@ -1,0 +1,27 @@
+/* Account Pages Styles */
+
+/* Account Form */
+#account-form {
+    width: 50%;
+    margin: 35px auto;
+    text-align: center;
+    padding: 20px;
+}
+
+#account-form input {
+    margin: 5px auto;
+}
+
+#account-form #change-password-btn {
+    background-color: #2a61d8;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Account Info */
+.account-info #order-btn, #logout-btn {
+    color: rgb(17, 0, 255);
+    font-weight: bold;
+    text-decoration: none;
+}

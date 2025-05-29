@@ -1,0 +1,26 @@
+/* Responsive Styles - Media Queries */
+
+/* Navigation Mobile Styles */
+@media only screen and (max-width: 990px) {
+    .nav-buttons {
+        margin: 10px
+    }
+
+    .nav-buttons ul {
+        margin: 1rem;
+        justify-content: flex-start;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .nav-buttons ul .fas {
+        margin: 20px 5px 10px 20px;
+    }
+}
+
+/* Product Gallery Mobile */
+@media (max-width: 768px) {
+    .small-img-col {
+        flex: 0 1 calc(50% - 10px); /* 2 images per row on smaller screens */
+    }
+}

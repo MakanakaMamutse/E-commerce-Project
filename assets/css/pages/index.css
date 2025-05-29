@@ -1,0 +1,87 @@
+/* Homepage Specific Styles */
+
+/* Hero Section */
+#home {
+    background-image: url('/assets/images/homeBG.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+
+/* Banner Section */
+#banner {
+    background-image: url('/assets/images/banner.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: start;
+}
+
+/* New Products Section */
+#new .one { 
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid white;
+}
+
+#new .one img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#new .one {
+    position: relative;
+}
+
+#new .one .details {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: white;
+    font-weight: bold;
+    transition: 0.5s ease;
+    background-color: rgba(1, 1, 1, 0.6);
+    width: 100%;
+    height: 100%;
+}
+
+#new .one .details:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#new .one:nth-child(1) .details {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: start;
+}
+
+#new .one:nth-child(2) .details {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#new .one:nth-child(3) .details {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: start;
+}
