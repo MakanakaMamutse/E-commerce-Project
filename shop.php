@@ -21,12 +21,45 @@ $stmt = $conn->prepare($sql);
 $stmt->execute();
 $product = $stmt->get_result(); //this puts all products in the database into $result as an array
 //$products = $result->fetch_all(MYSQLI_ASSOC);  Fetch all products as an associative array
-
-
-
 // Close the statement      
 $stmt->close();
 
+
+// ========================================
+// GET CATEGORY COUNTS FOR FILTER SIDEBAR
+// ========================================
+
+// Initializing am empty array to store category counts
+$category_count = [];
+
+// SQL Query: Get count of active products for each category
+$category_query = " SELECT 
+        c.category_name, 
+        COUNT(p.product_id) as product_count 
+    FROM categories c 
+    LEFT JOIN products p ON c.category_id = p.category_id 
+    GROUP BY c.category_id, c.category_name
+    ORDER BY c.category_name
+";
+
+// Execute the category count query
+$category_stmt = $conn->prepare($category_query);
+$category_stmt->execute();
+$category_result = $category_stmt->get_result();
+
+// Loop through results and store in our array
+while($row = $category_result->fetch_assoc()) {
+    $category_count[$row['category_name']] = $row['product_count'];
+}
+$category_stmt->close();
+
+// Get total count of all products
+$total_query = "SELECT COUNT(*) as total FROM products";
+$total_stmt = $conn->prepare($total_query);
+$total_stmt->execute();
+$total_result = $total_stmt->get_result();
+$total_count = $total_result->fetch_assoc()['total'];
+$total_stmt->close();
 
 
 ?>
@@ -114,35 +147,42 @@ $stmt->close();
                             <input type="checkbox" id="all-products" checked>
                             <label for="all-products">
                                 <span>All Products</span>
-                                <span class="product-count">24</span>
+                                <span class="product-count"><?php echo $total_count; ?></span>
                             </label>
                         </div>
                         <div class="filter-option">
                             <input type="checkbox" id="football-boots">
                             <label for="football-boots">
                                 <span>Football Boots</span>
-                                <span class="product-count">8</span>
+                                <span class="product-count"><?php echo $category_count['Football Boots'] ?? 0; ?></span>
                             </label>
                         </div>
                         <div class="filter-option">
                             <input type="checkbox" id="club-shirts">
                             <label for="club-shirts">
                                 <span>Club Shirts</span>
-                                <span class="product-count">6</span>
+                                <span class="product-count"><?php echo $category_count['Club Shirts'] ?? 0; ?></span>
                             </label>
                         </div>
                         <div class="filter-option">
                             <input type="checkbox" id="national-team">
                             <label for="national-team">
                                 <span>National Kits</span>
-                                <span class="product-count">4</span>
+                                <span class="product-count"><?php echo $category_count['National Team Shirts'] ?? 0; ?></span>
+                            </label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="footballs">
+                            <label for="footballs">
+                                <span>Footballs</span>
+                                <span class="product-count"><?php echo $category_count['Footballs'] ?? 0; ?></span>
                             </label>
                         </div>
                         <div class="filter-option">
                             <input type="checkbox" id="training-gear">
                             <label for="training-gear">
                                 <span>Training Gear</span>
-                                <span class="product-count">6</span>
+                                <span class="product-count"><?php echo $category_count['Gear'] ?? 0; ?></span>
                             </label>
                         </div>
                     </div>
@@ -151,10 +191,10 @@ $stmt->close();
                     <div class="filter-section">
                         <h6 class="filter-title">Price Range</h6>
                         <div class="price-range">
-                            <input type="range" class="price-slider" id="priceRange" min="0" max="1000" value="500">
+                            <input type="range" class="price-slider" id="priceRange" min="0" max="500" value="250">
                             <div class="price-display">
-                                <span>R0</span>
-                                <span id="maxPrice">R500</span>
+                                <span>$0</span>
+                                <span id="maxPrice">$500</span>
                             </div>
                         </div>
                     </div>
@@ -216,9 +256,9 @@ $stmt->close();
                     <?php while ($row = $product->fetch_assoc()) { ?>
 
                         <!-- Product Card 1 -->
-                        <div class="product-card" onclick="window.location.href='singleProduct.php';">
+                        <div class="product-card" onclick="window.location.href='singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id']); ?>';">
                             <div class="product-image-container">
-                                <img class="product-image" src="assets/<?php echo $row['image_url']; ?>" alt="<?php echo $row['product_name']; ?>" onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
+                                <img class="product-image" src="assets/<?php echo $row['image_url']; ?>"  alt="<?php echo htmlspecialchars($row['product_name']); ?>" onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
                                 <div class="product-badge">New</div>
                                 <button class="wishlist-btn" onclick="event.stopPropagation();">
                                     <i class="far fa-heart"></i>
@@ -226,19 +266,19 @@ $stmt->close();
                             </div>
                             <div class="product-info">
                                 <div class="product-category"><?php echo $row['category_name']; ?></div>
-                                <h5 class="product-name"><?php echo $row['product_name']; ?></h5>
+                                <h5 class="product-name"><?php echo htmlspecialchars($row['product_name']); ?></h5>
                                 <span class="description mb-1"><?php echo $row['description']; ?></span>
-                                <div class="product-price">$  <?php echo $row['price']; ?></div>
+                                <div class="product-price">$ <?php echo htmlspecialchars(number_format($row['price'], 2)); ?></div>
                                 <div class="product-actions">
-                                    <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                    <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
+                                    <button class="btn btn-primary-custom" onclick="event.stopPropagation(); window.location.href='singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id']); ?>';">Buy Now</button>
+                                    <button class="add-to-cart btn btn-outline-custom" 
+                                            onclick="event.stopPropagation(); addToCart(this, '<?php echo $row['product_id']; ?>', '<?php echo htmlspecialchars($row['product_name']); ?>', '<?php echo $row['price']; ?>', '<?php echo $row['image_url']; ?>');">
                                         <i class="fas fa-shopping-cart"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     <?php } ?>
-
 
 
                                            <!-- <div class="unused-product-card">
@@ -391,7 +431,7 @@ $stmt->close();
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div> End of unused products-grid -->
+                                            </div> End of unused products-grid, was hardcoded-->
                         </div>
 
                     <!-- Pagination -->
@@ -430,282 +470,338 @@ $stmt->close();
 
     <!-- Custom JavaScript for functionality -->
     <script>
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
+// Wait for DOM to be fully loaded, important for elements to be available else stabilty issues
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Price range slider functionality
+    const priceSlider = document.getElementById('priceRange');
+    const maxPriceDisplay = document.getElementById('maxPrice');
+
+    if (priceSlider && maxPriceDisplay) {
+        priceSlider.addEventListener('input', function() {
+            maxPriceDisplay.textContent = '$' + this.value;
+        });
+    } //When you drag the price slider, the displayed price updates in real-time
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const productCards = document.querySelectorAll('.product-card'); //Find ALL product cards on the page (returns a list)
+
+    if (searchInput) { //Check if search input exists
+        searchInput.addEventListener('input', function() {
+            filterProducts(); // Call filterProducts whenever the search input changes
+        });
+    }
+
+    // Category filter functionality
+    const categoryCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+    const allProductsCheckbox = document.getElementById('all-products');
+
+    categoryCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.id === 'all-products') {//using ids to identify the checkboxes
+                if (this.checked) {
+                    // Uncheck all other categories if all products is checked
+                    categoryCheckboxes.forEach(cb => {
+                        if (cb.id !== 'all-products') {
+                            cb.checked = false;
+                        }
+                    });
+                }
+            } else {
+                // If any specific category is checked, uncheck "All Products"
+                if (this.checked && allProductsCheckbox) {
+                    allProductsCheckbox.checked = false;
+                }
+            }
             
-        // Price range slider functionality
-        const priceSlider = document.getElementById('priceRange');
-        const maxPriceDisplay = document.getElementById('maxPrice');
+            filterProducts();
+        });
+    });
 
-        if (priceSlider && maxPriceDisplay) {
-            priceSlider.addEventListener('input', function() {
-                maxPriceDisplay.textContent = 'R' + this.value;
-            });
+    // Brand filter functionality
+    const brandCheckboxes = document.querySelectorAll('#nike, #adidas, #puma'); //Finding the three brand checkboxes specifically by using their ids
+    brandCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            filterProducts(); //listen for changes and run the filter
+        });
+    });
+
+    // Price filter functionality
+    if (priceSlider) {
+        priceSlider.addEventListener('input', function() {
+            filterProducts();
+        });
+    }
+
+    // Combined filter function
+    function filterProducts() {
+
+        //Gather all current filter settings (what categories are selected, what brands, what price, what search term)
+        const selectedCategories = getSelectedCategories();
+        const selectedBrands = getSelectedBrands();
+        const maxPrice = parseInt(priceSlider ? priceSlider.value : 500);
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        
+
+        productCards.forEach(card => { //looping Loop through every product card
+            const productName = card.querySelector('.product-name');
+            const productCategory = card.querySelector('.product-category');
+            const productPriceElement = card.querySelector('.product-price');
+            
+            if (!productName || !productCategory || !productPriceElement) return; //Safety check - if any element is missing, skip this product
+            
+
+            // Get text content and format it for comparison
+            const nameText = productName.textContent.toLowerCase();
+            const categoryText = productCategory.textContent.toLowerCase();
+            const priceText = productPriceElement.textContent.replace('$', '').trim();
+            const price = parseFloat(priceText); //convert price to a number
+
+
+            if (isNaN(price)) return; // If price is not a number, skip this product
+
+
+            // Check search term
+            const matchesSearch = searchTerm === '' || nameText.includes(searchTerm) || categoryText.includes(searchTerm); //Product matches search if: no search term OR name contains search term OR category contains search term - bugged to be fixed
+            
+            // Check category filter
+            let matchesCategory = true;
+            if (!allProductsCheckbox?.checked && selectedCategories.length > 0) { // Only filter by category if "All Products" is NOT checked AND some categories are selected
+                matchesCategory = selectedCategories.some(cat => {
+                    // Map category names to match your database values
+                    const categoryMap = {
+                        'football boots': ['football boots', 'boots'],
+                        'club shirts': ['club shirts', 'shirts', 'club'],
+                        'national kits': ['national kits', 'national team', 'kits'],
+                        'footballs': ['footballs', 'ball'],
+                        'training gear': ['gear', 'training gear', 'training']
+                    };
+                    
+                    const searchTerms = categoryMap[cat.toLowerCase()] || [cat.toLowerCase()]; // e.g searchTerms = ['gear', 'training gear', 'training'], with fallback to just the category name if not found
+                    return searchTerms.some(term => categoryText.includes(term)); //term = 'gear': does 'gear'.includes('gear')? YES
+                });
+            }
+            
+            // Check brand filter
+            let matchesBrand = true;
+            if (selectedBrands.length > 0) {
+                matchesBrand = selectedBrands.some(brand => nameText.includes(brand.toLowerCase()));
+            }//Check if product name contains any selected brand names
+            
+            // Check price filter
+            const matchesPrice = isNaN(price) || price <= maxPrice;
+            
+
+
+
+             //Product is shown ONLY if it passes ALL filters
+            if (matchesSearch && matchesCategory && matchesBrand && matchesPrice) {
+                card.style.display = 'flex'; //showing the product card
+            } else {
+                card.style.display = 'none'; //hiding the product card
+            }
+        });
+        
+        updateProductCount(); // Update the product count after filtering || Showing X of Y products
+    }
+
+    function getSelectedCategories() {
+        const categories = [];
+        const categoryMappings = {
+            'football-boots': 'Football Boots',
+            'club-shirts': 'Club Shirts', 
+            'national-team': 'National Kits',
+            'footballs': 'Footballs',
+            'training-gear': 'Training Gear'
+        };
+        
+        Object.keys(categoryMappings).forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox && checkbox.checked) {
+                categories.push(categoryMappings[id]);
+            }
+        });
+        
+        return categories;
+    }
+
+    function getSelectedBrands() {
+        const brands = [];
+        const brandIds = ['nike', 'adidas', 'puma'];
+        
+        brandIds.forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox && checkbox.checked) {
+                brands.push(id);
+            }
+        });
+        
+        return brands;
+    }
+
+    // Update product count display
+    function updateProductCount() {
+        const visibleCount = Array.from(productCards).filter(card => 
+            card.style.display !== 'none'
+        ).length;
+        
+        const productsMeta = document.querySelector('.products-meta');
+        if (productsMeta) {
+            productsMeta.textContent = `Showing ${visibleCount} of ${productCards.length} products`;
         }
+    }
 
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        const productCards = document.querySelectorAll('.product-card');
+    // Sort functionality
+    const sortDropdown = document.querySelector('.sort-dropdown');
 
+    if (sortDropdown) {
+        sortDropdown.addEventListener('change', function() {
+            const sortValue = this.value;
+            const productsGrid = document.getElementById('productsGrid');
+            const productArray = Array.from(productCards);
+            
+            productArray.sort((a, b) => {
+                const aName = a.querySelector('.product-name')?.textContent || '';
+                const bName = b.querySelector('.product-name')?.textContent || '';
+                const aPriceText = a.querySelector('.product-price')?.textContent.replace('$', '').trim() || '0';
+                const bPriceText = b.querySelector('.product-price')?.textContent.replace('$', '').trim() || '0';
+                const aPrice = parseFloat(aPriceText);
+                const bPrice = parseFloat(bPriceText);
+                
+                switch(sortValue) {
+                    case 'Price: Low to High':
+                        return aPrice - bPrice;
+                    case 'Price: High to Low':
+                        return bPrice - aPrice;
+                    case 'Name: A to Z':
+                        return aName.localeCompare(bName);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Re-append sorted products
+            if (productsGrid) {
+                productArray.forEach(card => productsGrid.appendChild(card));
+            }
+        });
+    }
+
+    // Clear all filters function - make it globally accessible
+    window.clearAllFilters = function() {
+        // Clear search
         if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                
-                productCards.forEach(card => {
-                    const productName = card.querySelector('.product-name');
-                    const productCategory = card.querySelector('.product-category');
-                    
-                    if (productName && productCategory) {
-                        const nameText = productName.textContent.toLowerCase();
-                        const categoryText = productCategory.textContent.toLowerCase();
-                        
-                        if (nameText.includes(searchTerm) || categoryText.includes(searchTerm)) {
-                            card.style.display = 'flex';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    }
-                });
-                
-                updateProductCount();
-            });
+            searchInput.value = '';
         }
-
-        // Category filter functionality
-        const categoryCheckboxes = document.querySelectorAll('input[type="checkbox"]');
-        const allProductsCheckbox = document.getElementById('all-products');
-
+        
+        // Reset price slider
+        if (priceSlider && maxPriceDisplay) {
+            priceSlider.value = 500;
+            maxPriceDisplay.textContent = '$500';
+        }
+        
+        // Reset checkboxes
         categoryCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                if (this.id === 'all-products') {
-                    if (this.checked) {
-                        // Uncheck all other categories
-                        categoryCheckboxes.forEach(cb => {
-                            if (cb.id !== 'all-products') {
-                                cb.checked = false;
-                            }
-                        });
-                        // Show all products
-                        productCards.forEach(card => {
-                            card.style.display = 'flex';
-                        });
-                    }
-                } else {
-                    // If any specific category is checked, uncheck "All Products"
-                    if (this.checked && allProductsCheckbox) {
-                        allProductsCheckbox.checked = false;
-                    }
-                    
-                    // Filter products based on selected categories
-                    filterByCategory();
-                }
-                
-                updateProductCount();
-            });
-        });
-
-        // Brand filter functionality
-        const brandCheckboxes = document.querySelectorAll('#nike, #adidas, #puma');
-
-        brandCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                filterProducts();
-            });
-        });
-
-        // Price filter functionality
-        if (priceSlider) {
-            priceSlider.addEventListener('input', function() {
-                filterProducts();
-            });
-        }
-
-        // Combined filter function
-        function filterProducts() {
-            const selectedCategories = getSelectedCategories();
-            const selectedBrands = getSelectedBrands();
-            const maxPrice = parseInt(priceSlider ? priceSlider.value : 1000);
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            
-            productCards.forEach(card => {
-                const productName = card.querySelector('.product-name');
-                const productCategory = card.querySelector('.product-category');
-                const productPriceElement = card.querySelector('.product-price');
-                
-                if (!productName || !productCategory || !productPriceElement) return;
-                
-                const nameText = productName.textContent.toLowerCase();
-                const categoryText = productCategory.textContent.toLowerCase();
-                const priceText = productPriceElement.textContent.replace('$', '');
-                const price = parseInt(priceText);
-                
-                // Check search term
-                const matchesSearch = nameText.includes(searchTerm) || categoryText.includes(searchTerm);
-                
-                // Check category filter
-                const matchesCategory = selectedCategories.length === 0 || 
-                                      allProductsCheckbox?.checked || 
-                                      selectedCategories.some(cat => categoryText.includes(cat.toLowerCase()));
-                
-                // Check brand filter (you'll need to add brand info to your HTML or determine from product name)
-                const matchesBrand = selectedBrands.length === 0 || checkProductBrand(nameText, selectedBrands);
-                
-                // Check price filter
-                const matchesPrice = price <= maxPrice;
-                
-                if (matchesSearch && matchesCategory && matchesBrand && matchesPrice) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            
-            updateProductCount();
-        }
-
-        function getSelectedCategories() {
-            const categories = [];
-            const categoryIds = ['football-boots', 'club-shirts', 'national-team', 'training-gear'];
-            
-            categoryIds.forEach(id => {
-                const checkbox = document.getElementById(id);
-                if (checkbox && checkbox.checked) {
-                    const label = checkbox.nextElementSibling;
-                    if (label) {
-                        const spanText = label.querySelector('span');
-                        if (spanText) {
-                            categories.push(spanText.textContent.trim());
-                        }
-                    }
-                }
-            });
-            
-            return categories;
-        }
-
-        function getSelectedBrands() {
-            const brands = [];
-            const brandIds = ['nike', 'adidas', 'puma'];
-            
-            brandIds.forEach(id => {
-                const checkbox = document.getElementById(id);
-                if (checkbox && checkbox.checked) {
-                    brands.push(id);
-                }
-            });
-            
-            return brands;
-        }
-
-        function checkProductBrand(productName, selectedBrands) {
-            return selectedBrands.some(brand => productName.includes(brand));
-        }
-
-        function filterByCategory() {
-            const selectedCategories = getSelectedCategories();
-            
-            productCards.forEach(card => {
-                const productCategory = card.querySelector('.product-category');
-                
-                if (productCategory) {
-                    const categoryText = productCategory.textContent.toLowerCase();
-                    
-                    if (selectedCategories.length === 0 || 
-                        selectedCategories.some(cat => categoryText.includes(cat.toLowerCase()))) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                }
-            });
-        }
-
-        // Update product count display
-        function updateProductCount() {
-            const visibleProducts = document.querySelectorAll('.product-card[style*="flex"], .product-card:not([style*="none"])');
-            const productsMeta = document.querySelector('.products-meta');
-            
-            if (productsMeta) {
-                const visibleCount = Array.from(productCards).filter(card => 
-                    card.style.display !== 'none'
-                ).length;
-                productsMeta.textContent = `Showing ${visibleCount} of ${productCards.length} products`;
+            if (checkbox.id === 'all-products') {
+                checkbox.checked = true;
+            } else {
+                checkbox.checked = false;
             }
-        }
-
-        // Sort functionality
-        const sortDropdown = document.querySelector('.sort-dropdown');
-
+        });
+        
+        // Show all products
+        productCards.forEach(card => {
+            card.style.display = 'flex';
+        });
+        
+        // Reset sort dropdown
         if (sortDropdown) {
-            sortDropdown.addEventListener('change', function() {
-                const sortValue = this.value;
-                const productsGrid = document.getElementById('productsGrid');
-                const productArray = Array.from(productCards);
-                
-                productArray.sort((a, b) => {
-                    const aName = a.querySelector('.product-name')?.textContent || '';
-                    const bName = b.querySelector('.product-name')?.textContent || '';
-                    const aPrice = parseInt(a.querySelector('.product-price')?.textContent.replace('R', '') || '0');
-                    const bPrice = parseInt(b.querySelector('.product-price')?.textContent.replace('R', '') || '0');
-                    
-                    switch(sortValue) {
-                        case 'Price: Low to High':
-                            return aPrice - bPrice;
-                        case 'Price: High to Low':
-                            return bPrice - aPrice;
-                        case 'Name: A to Z':
-                            return aName.localeCompare(bName);
-                        default:
-                            return 0;
-                    }
-                });
-                
-                // Re-append sorted products
-                if (productsGrid) {
-                    productArray.forEach(card => productsGrid.appendChild(card));
-                }
-            });
+            sortDropdown.value = 'Sort by: Default';
         }
-
-        // Clear all filters function
-        function clearAllFilters() {
-            // Clear search
-            if (searchInput) {
-                searchInput.value = '';
-            }
-            
-            // Reset price slider
-            if (priceSlider && maxPriceDisplay) {
-                priceSlider.value = 500;
-                maxPriceDisplay.textContent = 'R500';
-            }
-            
-            // Reset checkboxes
-            categoryCheckboxes.forEach(checkbox => {
-                if (checkbox.id === 'all-products') {
-                    checkbox.checked = true;
-                } else {
-                    checkbox.checked = false;
-                }
-            });
-            
-            // Show all products
-            productCards.forEach(card => {
-                card.style.display = 'flex';
-            });
-            
-            // Reset sort dropdown
-            if (sortDropdown) {
-                sortDropdown.value = 'Sort by: Default';
-            }
-            
-            updateProductCount();
-        }
-
-        // Initialize
+        
         updateProductCount();
+    };
 
-        }); // End of DOMContentLoaded
+    // Initialize
+    updateProductCount();
+
+}); // End of DOMContentLoaded
+
+// The code is essentially a bunch of "listeners" that watch for changes, and one main function that decides which products to show or hide based on all the current filter settings.
+
+
+
+        // Function to add product to cart in the backgorund with me having to reload the page, it will then also have pop up a message to tell the user that the product has been added to the cart
+
+
+
+        function addToCart(button, productId, productName, productPrice, productImage) {
+                    // Created form data object to send product details, works like an invisble HTML form submission just <form method "POST">
+            const formData = new FormData();
+            formData.append('add_to_cart', '1'); // Indicate that this is an add to cart request - 1 just a flag so that formData can be sent to cart.php
+            formData.append('product_id', productId);
+            formData.append('product_name', productName);
+            formData.append('product_price', productPrice);
+            formData.append('product_image', productImage);
+            formData.append('product_quantity', '1'); // Default quantity since its 1 item.
+            
+            // Send to cart.php
+            fetch('cart.php', { //Fetch API to send data to cart.php
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text()) //Cart/php wont send anything back, so we wait for the process to finish
+            .then(data => {
+                // Shows success message to the user
+            // alert('Product added to cart!'); //forces me to click ok to continue, annoying
+                
+                showCardNotification(button, 'Added to cart!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding to cart');
+            });
+        }
+
+        // The Simple notification function // To be worked on later
+            function showCardNotification(button, message) {
+                // Create notification
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    background: #28a745;
+                    color: white;
+                    padding: 12px;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    text-align: center;
+                    z-index: 1000;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                `;
+                
+                // Find the product-actions div (the container with both buttons)
+                const productActions = button.closest('.product-actions');
+                
+                // Make sure it has relative positioning
+                productActions.style.position = 'relative';
+                
+                // Add notification to cover the buttons area
+                productActions.appendChild(notification);
+                
+                // Remove after 2 seconds
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.parentElement.removeChild(notification);
+                    }
+                }, 2000);
+            }
 
    </script>
 
