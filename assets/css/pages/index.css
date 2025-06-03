@@ -85,3 +85,10 @@
     align-items: center;
     text-align: start;
 }
+
+ .product img{
+        width: 100%; 
+        height: 350px; /* Fixed height for images */
+        object-fit: contain; /* Ensures entire image is visible */
+        object-position: center; /* Centers the image */
+      }
