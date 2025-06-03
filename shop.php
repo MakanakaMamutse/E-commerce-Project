@@ -191,7 +191,7 @@ $total_stmt->close();
                     <div class="filter-section">
                         <h6 class="filter-title">Price Range</h6>
                         <div class="price-range">
-                            <input type="range" class="price-slider" id="priceRange" min="0" max="500" value="250">
+                            <input type="range" class="price-slider" id="priceRange" min="0" max="500" value="500">
                             <div class="price-display">
                                 <span>$0</span>
                                 <span id="maxPrice">$500</span>
@@ -607,9 +607,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProductCount(); // Update the product count after filtering || Showing X of Y products
     }
 
+    // Helper functions to get selected categories and brands
+
     function getSelectedCategories() {
-        const categories = [];
-        const categoryMappings = {
+        const categories = []; //Creating an empty list to store selected categories
+        const categoryMappings = { //Mapping checkbox IDs to category names
             'football-boots': 'Football Boots',
             'club-shirts': 'Club Shirts', 
             'national-team': 'National Kits',
@@ -618,22 +620,22 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         Object.keys(categoryMappings).forEach(id => {
-            const checkbox = document.getElementById(id);
+            const checkbox = document.getElementById(id); 
             if (checkbox && checkbox.checked) {
                 categories.push(categoryMappings[id]);
-            }
+            } //If checkbox exists and is checked, add the corresponding category name to the list
         });
         
-        return categories;
+        return categories; // Return the list of selected categories
     }
 
     function getSelectedBrands() {
         const brands = [];
         const brandIds = ['nike', 'adidas', 'puma'];
         
-        brandIds.forEach(id => {
+        brandIds.forEach(id => { // Loop through each brand ID
             const checkbox = document.getElementById(id);
-            if (checkbox && checkbox.checked) {
+            if (checkbox && checkbox.checked) { // If the checkbox exists and is checked add it to the list
                 brands.push(id);
             }
         });
@@ -643,25 +645,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update product count display
     function updateProductCount() {
+    // Count how many products are currently visible (not hidden)
         const visibleCount = Array.from(productCards).filter(card => 
             card.style.display !== 'none'
         ).length;
         
+         // Find the text element that shows the count, in html it is the products-meta class
         const productsMeta = document.querySelector('.products-meta');
-        if (productsMeta) {
+        if (productsMeta) {   // Update the text with current numbers
             productsMeta.textContent = `Showing ${visibleCount} of ${productCards.length} products`;
         }
     }
 
-    // Sort functionality
+    // Sort functionality, Looking for an element with class 'sort-dropdown'
     const sortDropdown = document.querySelector('.sort-dropdown');
 
+     //Check if the dropdown exists before adding functionality
     if (sortDropdown) {
-        sortDropdown.addEventListener('change', function() {
-            const sortValue = this.value;
+        sortDropdown.addEventListener('change', function() { //he 'change' event fires when a new option is selected from the dropdown
+            const sortValue = this.value; //'this' refers to the dropdown element, 'value' gets the selected option's value
             const productsGrid = document.getElementById('productsGrid');
-            const productArray = Array.from(productCards);
+            const productArray = Array.from(productCards); //Array.from() converts it to an array
             
+
+            // Sort the product cards based on the selected option, This targets my <h5 class="product-name"> elements inside each product card
             productArray.sort((a, b) => {
                 const aName = a.querySelector('.product-name')?.textContent || '';
                 const bName = b.querySelector('.product-name')?.textContent || '';
@@ -670,28 +677,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 const aPrice = parseFloat(aPriceText);
                 const bPrice = parseFloat(bPriceText);
                 
+                // Determining sorting logic based on the selected dropdown value
                 switch(sortValue) {
                     case 'Price: Low to High':
-                        return aPrice - bPrice;
+                        return aPrice - bPrice; //                // Subtract aPrice from bPrice: negative = a comes first, positive = b comes first
                     case 'Price: High to Low':
-                        return bPrice - aPrice;
+                        return bPrice - aPrice; // Reversing the low-to-high logic
                     case 'Name: A to Z':
-                        return aName.localeCompare(bName);
-                    default:
-                        return 0;
+                        return aName.localeCompare(bName); // localeCompare() handles proper alphabetical sorting including special characters
+                    default: /// Default case: no sorting (maintain original order) 
+                        return 0;// Return 0 means elements are considered equal
                 }
             });
             
-            // Re-append sorted products
+            // Re-append sorted products by update the DOM with the newly sorted product cards
             if (productsGrid) {
                 productArray.forEach(card => productsGrid.appendChild(card));
             }
         });
     }
 
-    // Clear all filters function - make it globally accessible
+    // This function resets all filter controls and shows all products
+
     window.clearAllFilters = function() {
-        // Clear search
+        // Clear the search input field
         if (searchInput) {
             searchInput.value = '';
         }
