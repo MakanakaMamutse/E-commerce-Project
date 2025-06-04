@@ -64,8 +64,6 @@ $total_stmt->close();
 ?>
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -464,9 +462,6 @@ $total_stmt->close();
         </div>
     </div>
       
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
     <!-- Custom JavaScript for functionality -->
     <script>
         // Wait for DOM to be fully loaded, important for elements to be available else stabilty issues
@@ -812,6 +807,9 @@ $total_stmt->close();
                     }
 
    </script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     </body>
 </html>

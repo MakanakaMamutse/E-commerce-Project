@@ -83,7 +83,7 @@
           </div>
 
           <h5 class="p-name"> <?php echo $row['product_name']; ?> </h5>
-          <h4 class="p-price">R <?php echo $row['price']; ?> </h4>
+          <h4 class="p-price">$ <?php echo $row['price']; ?> </h4>
           <p>Get the best shoes on the market</p>
           <a href="singleProduct.php?product_id=<?php echo $row['product_id']; ?>" class="buy-btn">Buy Now</a>
         </div>
@@ -144,54 +144,25 @@
       </div>
 
       <div class="row mx-auto container-fluid">
-        <div class="product text-center col-lg-3 col-md-6 col-sm-12">
-          <img class="img-fluid mb-3" src="assets/images/boot1.png"/>
-          <div class="star">
-            <i class="fas fa-star"></i>
-          </div>
 
-          <h5 class="p-name">Best Shoes</h5>
-          <h4 class="p-price">R350</h4>
-          <p>Get the best shoes on the market</p>
-          <a href="singleProduct.php?product_id=<?php echo $row['product_id']; ?>" class="buy-btn">Buy Now</a>
-        </div>
+        <?php include('server/get_shirts.php'); ?>
 
-        <div class="product text-center col-lg-3 col-md-6 col-sm-12">
-          <img class="img-fluid mb-3" src="assets/images/boot2.png"/>
-          <div class="star">
-            <i class="fas fa-star"></i>
-          </div>
-
-          <h5 class="p-name">Best Shoes</h5>
-          <h4 class="p-price">R350</h4>
-          <p>Get the best shoes on the market</p>
-          <button>Buy Now</button>
-        </div>
-
-        <div class="product text-center col-lg-3 col-md-6 col-sm-12">
-          <img class="img-fluid mb-3" src="assets/images/boot4.png"/>
-          <div class="star">
-            <i class="fas fa-star"></i>
-          </div>
-
-          <h5 class="p-name">Best Shoes</h5>
-          <h4 class="p-price">R350</h4>
-          <p>Get the best shoes on the market</p>
-          <button class="buy-btn">Buy Now</button>
-        </div>
-
-        <div class="product text-center col-lg-3 col-md-6 col-sm-12">
-          <img class="img-fluid mb-3" src="assets/images/boot5.png"/>
-          <div class="star">
-            <i class="fas fa-star"></i>
-          </div>
-
-          <h5 class="p-name">Best Shoes</h5>
-          <h4 class="p-price">R350</h4>
-          <p>Get the best shoes on the market</p>
-          <button class="buy-btn">Buy Now</button>
-        </div>
-
+        <?php while($row=$shirt_products->fetch_assoc()) { ?>
+            <div class="product text-center col-lg-3 col-md-6 col-sm-12">
+              <img class="img-fluid mb-3" src="assets/<?php echo $row['image_url']; ?>" alt="<?php echo $row['product_name']; ?>" onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
+              <div class="star">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <h5 class="p-name"><?php echo $row['product_name']; ?></h5>
+              <h4 class="p-price">$ <?php echo $row['price']; ?></h4>
+              <p>Get the best shirts on the market</p>
+              <a href="singleProduct.php?product_id=<?php echo $row['product_id']; ?>" class="buy-btn">Buy Now</a>
+            </div>
+          <?php } ?>
       </div>
     </section>
           

@@ -108,14 +108,14 @@ if (isset($_POST['change-password'])) {
 // Check if the user is logged in and then retrieve order history
 if (isset($_SESSION['login_status'])) {
     // Prepare SQL statement to fetch user orders
-    $user_email = $_SESSION['email'];
-    $orderQuery = "SELECT * FROM orders WHERE email = ? ORDER BY order_date DESC";
+    $customer_id = $_SESSION['user_id'];
+    $orderQuery = "SELECT * FROM orders WHERE customer_id = ? ORDER BY order_date DESC";  // Bugged to be fixed, as im saving the email in the session, but order can have a different email, maybe use customer ID instead
     $stmt = $conn->prepare($orderQuery);
     
     // Check if the statement was prepared successfully
     if ($stmt) {
         // Bind parameters and execute query
-        $stmt->bind_param("s", $user_email);
+        $stmt->bind_param("s", $customer_id);
         $stmt->execute();
         
         // Fetch results

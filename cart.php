@@ -61,7 +61,7 @@ if(isset($_POST['reset_session'])) {
     else {
         $product_id = $_POST['product_id'];
         $product_name = $_POST['product_name'];
-        $product_price = $_POST['product_price']; 
+        $product_price = floatval($_POST['product_price']); 
         $product_image = $_POST['product_image'];
         $product_quantity = $_POST['product_quantity'];
 
@@ -136,15 +136,24 @@ if(isset($_POST['reset_session'])) {
   function getCartTotal() {
     // Calculate the total price of all items in the cart
     $total = 0;
-    // Loop through each item in the cart and calculate the total
-    foreach($_SESSION['cart'] as $key => $value) {
-        $total += $value['product_price'] * $value['product_quantity'];
+    
+    // Check if cart exists and is not empty
+    if(isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+        // Loop through each item in the cart and calculate the total
+        foreach($_SESSION['cart'] as $key => $value) {
+            // Convert price and quantity to proper numeric types before calculation
+            $price = floatval($value['product_price']);
+            $quantity = intval($value['product_quantity']);
+            
+            $total += $price * $quantity;
+        }
     }
+    
     // Store the total in the session for later use
     // This is optional, but can be useful if you want to display the total in multiple places
     $_SESSION['cart_total'] = $total;
     return $total;
-  }
+}
   ?>
 
 <?php include('layouts/header.php'); ?>
