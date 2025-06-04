@@ -103,7 +103,7 @@ else {
                     <input type="hidden" name="product_price" value="<?php echo $product_data['price']; ?>">
                     <input type="hidden" name="product_image" value="<?php echo $product_data['image_url']; ?>">
                     
-                    <input type="number" name="product_quantity" value="1" min="1" id="quantity"/>
+                    <input type="number" name="product_quantity" value="1" min="1" max="10" id="quantity"/>
                     <button type="submit" class="add-to-cart-btn" name="add_to_cart" id="addToCartBtn">Add To Cart</button>
                 </form>
                 

@@ -104,7 +104,7 @@ if (isset($_POST['register'])) {
             
             // Registration successful - set session variables
             $_SESSION['username'] = $form_data['username'];
-            $_SESSION['user_email'] = $form_data['email'];
+            $_SESSION['email'] = $form_data['email'];
             $_SESSION['login_status'] = true;
             
             // Redirect to account page

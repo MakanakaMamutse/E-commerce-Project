@@ -109,7 +109,7 @@ if (isset($_POST['change-password'])) {
 if (isset($_SESSION['login_status'])) {
     // Prepare SQL statement to fetch user orders
     $customer_id = $_SESSION['user_id'];
-    $orderQuery = "SELECT * FROM orders WHERE customer_id = ? ORDER BY order_date DESC";  // Bugged to be fixed, as im saving the email in the session, but order can have a different email, maybe use customer ID instead
+    $orderQuery = "SELECT * FROM orders WHERE customer_id = ? ORDER BY order_date DESC";
     $stmt = $conn->prepare($orderQuery);
     
     // Check if the statement was prepared successfully
@@ -264,54 +264,6 @@ if (isset($_SESSION['login_status'])) {
                 </tr>
 
             <?php } ?>
-
-            <!-- Repeat for other products
-
-            <tr>
-              <td>
-                  <div class="product-info">
-                      <img src="assets/images/top4.png" alt="Product Image">
-                      <div>
-                          <p>Footbal Shirt</p>
-                          <small>Price: $50.00</small><br>
-                          <a href="#">Remove</a>
-                      </div>
-                  </div>
-              </td>
-              <td>
-                <input type="number" value="1" min="1">
-                <a class="edit-btn" href="#">Edit</a>
-              </td>
-
-              <td>
-                <span>$</span>
-                <span class="product-price">50.00</span>
-              </td>
-          </tr>
-
-          Repeat for other products 
-
-          <tr>
-            <td>
-                <div class="product-info">
-                    <img src="assets/images/top4.png" alt="Product Image">
-                    <div>
-                        <p>Footbal Shirt</p>
-                        <small>Price: $50.00</small><br>
-                        <a href="#">Remove</a>
-                    </div>
-                </div>
-            </td>
-            <td>
-              <input type="number" value="1" min="1">
-              <a class="edit-btn" href="#">Edit</a>
-            </td>
-
-            <td>
-              <span>$</span>
-              <span class="product-price">50.00</span>
-            </td>
-        </tr> -->
 
         </table>
 

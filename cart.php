@@ -4,8 +4,14 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 session_start();
-// session_destroy();   // Destroys the session
-// session_start();     // Start a fresh session
+
+// Initialize cart session variables if they don't exist
+if(!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = array();
+}
+if(!isset($_SESSION['cart_total'])) {
+    $_SESSION['cart_total'] = 0;
+}
 
 // To be converted to an empty cart funtion / stops session from being corrupted
 if(isset($_POST['reset_session'])) {
@@ -22,7 +28,7 @@ if(isset($_POST['reset_session'])) {
   if(isset($_POST['add_to_cart'])) {
       
     //if user has already added items to the cart
-    if(isset($_SESSION['cart'])) {
+    if(isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 
       //Checking if the product is already in the cart - will return array of those product ids
       $product_array_ids = array_column($_SESSION['cart'], 'product_id');
@@ -161,9 +167,12 @@ if(isset($_POST['reset_session'])) {
      <!--Cart Section-->  
      <section class="cart container my-5 py-5">
         <div class="container mt-5">
-            <h2 class="font-weight-bolde">Your Cart</h2>
+            <h2 class="font-weight-bolder">Your Cart</h2>
             <hr>
         </div>
+
+        <?php if(isset($_SESSION['cart']) && !empty($_SESSION['cart'])) { ?>
+        <!-- Cart has items - show the table -->
         <table class="mt-5 pt-5">
             <tr>
                 <th>Product</th>
@@ -197,7 +206,7 @@ if(isset($_POST['reset_session'])) {
                 <td>
                   <form method="POST" action="cart.php">
                     <input type="hidden" name="product_id" value="<?php echo $value['product_id']; ?>">
-                    <input type="number" name="product_quantity" value="<?php echo $value['product_quantity']; ?>" min="1">
+                    <input type="number" name="product_quantity" value="<?php echo $value['product_quantity']; ?>" min="1" max="10">
                     <input type="submit" name="edit_quantity" class="edit-btn" value="Edit">
                   </form>
                 </td>
@@ -231,9 +240,16 @@ if(isset($_POST['reset_session'])) {
             <input type="hidden" name="cart_total" value="<?php echo $_SESSION['cart_total']; ?>">
             <input type="submit" name="checkout" class="checkout-btn" value="Checkout">
           </form>
-          <!-- <button class="checkout-btn">Checkout</button> -->
-
         </div>
+        <?php } else { ?>
+            <!-- Cart is empty - show empty cart message -->
+            <div class="empty-cart mt-5 pt-5 text-center">
+                <h4>Your cart is empty</h4>
+                <p>Looks like you haven't added any items to your cart yet.</p>
+                <a href="shop.php" class="btn btn-primary">Continue Shopping</a>
+            </div>
+        <?php } ?>
+
      </section>
 
 <?php include('layouts/footer.php'); ?>
