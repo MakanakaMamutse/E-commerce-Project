@@ -1,16 +1,52 @@
 /* Homepage Specific Styles */
 
 /* Hero Section */
+/* Hero Section (Carousel Container) */
 #home {
-    background-image: url('/assets/images/homeBG.jpg');
-    background-size: cover;
-    background-position: center;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* Make the carousel fill its parent (#home) */
+#heroCarousel {
+    width: 100%;
+    height: 100%;
+}
+
+/* Style for the background image inside each carousel item */
+.carousel-bg-image {
+    object-fit: cover;
+    height: 100vh;
+    filter: brightness(60%);
+}
+
+/* Style for the caption content */
+.carousel-caption {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
     color: white;
     text-align: center;
+}
+
+/* Adjust text styling if needed, specific to the carousel caption */
+.carousel-caption h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+
+.carousel-caption p {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Will add other specific styles for button */
+.carousel-caption .btn {
+
 }
 
 /* Banner Section */

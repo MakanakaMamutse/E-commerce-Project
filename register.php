@@ -98,6 +98,14 @@ if (isset($_POST['register'])) {
         if ($insert_stmt->execute()) {
             
             $user_id = $conn->insert_id; // Get the newly created user ID from the database
+
+            // Assigning default 'customer' role
+            $role_sql = "INSERT INTO user_roles (user_id, role_type) VALUES (?, 'customer')";
+            $role_stmt = $conn->prepare($role_sql);
+            $role_stmt->bind_param("i", $user_id);
+            $role_stmt->execute();
+            $role_stmt->close();
+
             
             // Storung user ID in session
             $_SESSION['user_id'] = $user_id;

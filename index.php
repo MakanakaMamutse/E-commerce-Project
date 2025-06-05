@@ -1,15 +1,49 @@
 <?php include('layouts/header.php'); ?>
 
-    <!--Home-->
-    <section id="home">
+  <?php include('layouts/header.php'); ?>
 
-      <div class="">
-        <h5>NEW ARRIVALS</h5>
-        <h1>Best Prices This season</h1>
-        <p>Get 50% off on selected items</p>
-        <button>Shop Now</button>
+    <!--Home-->
+  <section id="home">
+        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="/assets/images/homeBG.jpg" class="d-block w-100 carousel-bg-image" alt="New Arrivals Background">
+                    <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                        <h5>NEW ARRIVALS</h5>
+                        <h1>Best Prices This season</h1>
+                        <p>Get 50% off on selected items</p>
+                        <button class="btn btn-light">Shop Now</button>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <img src="/assets/images/heroBG4.jpg" class="d-block w-100 carousel-bg-image" alt="Special Offer Background">
+                    <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                        <h5>LIMITED TIME OFFER</h5>
+                        <h1>Flash Sale on Footwear</h1>
+                        <p>Up to 70% off on sneakers and boots!</p>
+                        <button class="btn btn-light">View Deals</button>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <img src="/assets/images/heroBG3.jpg" class="d-block w-100 carousel-bg-image" alt="New Collection Background">
+                    <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                        <h5>SUMMER COLLECTION</h5>
+                        <h1>Fresh Styles for the Season</h1>
+                        <p>Explore our latest apparel and accessories</p>
+                        <button class="btn btn-light">Discover More</button>
+                    </div>
+                </div>
+             </div>
       </div>
-    </section>
+  </section>
 
     <!--Brand-->
     <section id="brand">

@@ -250,186 +250,33 @@ $total_stmt->close();
                     <!-- Products Grid -->
                     <div class="products-grid" id="productsGrid">
 
-                    <?php while ($row = $product->fetch_assoc()) { ?>
+                        <?php while ($row = $product->fetch_assoc()) { ?>
 
-                        <!-- Product Card 1 -->
-                        <div class="product-card" onclick="window.location.href='singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id']); ?>';">
-                            <div class="product-image-container">
-                                <img class="product-image" src="assets/<?php echo $row['image_url']; ?>"  alt="<?php echo htmlspecialchars($row['product_name']); ?>" onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
-                                <div class="product-badge">New</div>
-                                <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="product-info">
-                                <div class="product-category"><?php echo $row['category_name']; ?></div>
-                                <h5 class="product-name"><?php echo htmlspecialchars($row['product_name']); ?></h5>
-                                <span class="description mb-1"><?php echo $row['description']; ?></span>
-                                <div class="product-price">$ <?php echo htmlspecialchars(number_format($row['price'], 2)); ?></div>
-                                <div class="product-actions">
-                                    <button class="btn btn-primary-custom" onclick="event.stopPropagation(); window.location.href='singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id']); ?>';">Buy Now</button>
-                                    <button class="add-to-cart btn btn-outline-custom" 
-                                            onclick="event.stopPropagation(); addToCart(this, '<?php echo $row['product_id']; ?>', '<?php echo htmlspecialchars($row['product_name']); ?>', '<?php echo $row['price']; ?>', '<?php echo $row['image_url']; ?>');">
-                                        <i class="fas fa-shopping-cart"></i>
+                            <!-- Product Card 1 -->
+                            <div class="product-card" onclick="window.location.href='singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id']); ?>';">
+                                <div class="product-image-container">
+                                    <img class="product-image" src="assets/<?php echo $row['image_url']; ?>"  alt="<?php echo htmlspecialchars($row['product_name']); ?>" onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
+                                    <div class="product-badge">New</div>
+                                    <button class="wishlist-btn" onclick="event.stopPropagation();">
+                                        <i class="far fa-heart"></i>
                                     </button>
                                 </div>
+                                <div class="product-info">
+                                    <div class="product-category"><?php echo $row['category_name']; ?></div>
+                                    <h5 class="product-name"><?php echo htmlspecialchars($row['product_name']); ?></h5>
+                                    <span class="description mb-1"><?php echo $row['description']; ?></span>
+                                    <div class="product-price">$ <?php echo htmlspecialchars(number_format($row['price'], 2)); ?></div>
+                                    <div class="product-actions">
+                                        <button class="btn btn-primary-custom" onclick="event.stopPropagation(); window.location.href='singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id']); ?>';">Buy Now</button>
+                                        <button class="add-to-cart btn btn-outline-custom" 
+                                                onclick="event.stopPropagation(); addToCart(this, '<?php echo $row['product_id']; ?>', '<?php echo htmlspecialchars($row['product_name']); ?>', '<?php echo $row['price']; ?>', '<?php echo $row['image_url']; ?>');">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    <?php } ?>
-
-
-                                           <!-- <div class="unused-product-card">
-                                                     Product Card 2 
-                                                    <div class="product-card" onclick="window.location.href='singleProduct.html';">
-                                                        <div class="product-image-container">
-                                                            <img class="product-image" src="assets/images/chelsea-home-2023.png" alt="Club Jersey">
-                                                            <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="product-info">
-                                                            <div class="product-category">Club Shirts</div>
-                                                            <h5 class="product-name">Chelsea Home Jersey 2024</h5>
-                                                            <div class="product-price">R650</div>
-                                                            <div class="product-actions">
-                                                                <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                                                <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
-                                                                    <i class="fas fa-shopping-cart"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    Product Card 3 
-                                                    <div class="product-card" onclick="window.location.href='singleProduct.html';">
-                                                        <div class="product-image-container">
-                                                            <img class="product-image" src="assets/images/equip2.png" alt="Training Equipment">
-                                                            <div class="product-badge">Sale</div>
-                                                            <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="product-info">
-                                                            <div class="product-category">Training Equipment</div>
-                                                            <h5 class="product-name">Professional Training Cones</h5>
-                                                            <div class="product-price">R180</div>
-                                                            <div class="product-actions">
-                                                                <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                                                <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
-                                                                    <i class="fas fa-shopping-cart"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                     Product Card 4 
-                                                    <div class="product-card" onclick="window.location.href='singleProduct.html';">
-                                                        <div class="product-image-container">
-                                                            <img class="product-image" src="assets/images/top4.png" alt="Training Top">
-                                                            <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="product-info">
-                                                            <div class="product-category">Training Wear</div>
-                                                            <h5 class="product-name">Elite Training Top</h5>
-                                                            <div class="product-price">R320</div>
-                                                            <div class="product-actions">
-                                                                <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                                                <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
-                                                                    <i class="fas fa-shopping-cart"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                     Product Card 5 
-                                                    <div class="product-card" onclick="window.location.href='singleProduct.html';">
-                                                        <div class="product-image-container">
-                                                            <img class="product-image" src="assets/images/boot3.png" alt="Football Boots">
-                                                            <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="product-info">
-                                                            <div class="product-category">Football Boots</div>
-                                                            <h5 class="product-name">Speed Demon Boots</h5>
-                                                            <div class="product-price">R580</div>
-                                                            <div class="product-actions">
-                                                                <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                                                <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
-                                                                    <i class="fas fa-shopping-cart"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                     Product Card 6 
-                                                    <div class="product-card" onclick="window.location.href='singleProduct.html';">
-                                                        <div class="product-image-container">
-                                                            <img class="product-image" src="assets/images/top1.png" alt="National Kit">
-                                                            <div class="product-badge">Limited</div>
-                                                            <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="product-info">
-                                                            <div class="product-category">National Team</div>
-                                                            <h5 class="product-name">South Africa National Kit</h5>
-                                                            <div class="product-price">R750</div>
-                                                            <div class="product-actions">
-                                                                <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                                                <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
-                                                                    <i class="fas fa-shopping-cart"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                     Product Card 7 
-                                                    <div class="product-card" onclick="window.location.href='singleProduct.html';">
-                                                        <div class="product-image-container">
-                                                            <img class="product-image" src="assets/images/boot4.png" alt="Football Boots">
-                                                            <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="product-info">
-                                                            <div class="product-category">Football Boots</div>
-                                                            <h5 class="product-name">Classic Football Boots</h5>
-                                                            <div class="product-price">R390</div>
-                                                            <div class="product-actions">
-                                                                <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                                                <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
-                                                                    <i class="fas fa-shopping-cart"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                     Product Card 8 
-                                                    <div class="product-card" onclick="window.location.href='singleProduct.html';">
-                                                        <div class="product-image-container">
-                                                            <img class="product-image" src="assets/images/equip1.png" alt="Training Equipment">
-                                                            <button class="wishlist-btn" onclick="event.stopPropagation();">
-                                                                <i class="far fa-heart"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div class="product-info">
-                                                            <div class="product-category">Training Equipment</div>
-                                                            <h5 class="product-name">Training Ball Set</h5>
-                                                            <div class="product-price">R250</div>
-                                                            <div class="product-actions">
-                                                                <button class="btn btn-primary-custom" onclick="event.stopPropagation();">Buy Now</button>
-                                                                <button class="btn btn-outline-custom" onclick="event.stopPropagation();">
-                                                                    <i class="fas fa-shopping-cart"></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> End of unused products-grid, was hardcoded-->
-                        </div>
+                        <?php } ?>
+                    </div>
 
                     <!-- Pagination -->
                     <div class="pagination-wrapper">

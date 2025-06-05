@@ -172,75 +172,75 @@ if(isset($_POST['reset_session'])) {
         </div>
 
         <?php if(isset($_SESSION['cart']) && !empty($_SESSION['cart'])) { ?>
-        <!-- Cart has items - show the table -->
-        <table class="mt-5 pt-5">
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Total</th>
-            </tr>
+          <!-- Cart has items - show the table -->
+          <table class="mt-5 pt-5">
+              <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Total</th>
+              </tr>
 
-            <?php foreach($_SESSION['cart'] as $key => $value) { ?>
-
-
-            <tr>
-                <td>
-                    <div class="product-info">
-                        <img src="assets/<?php echo $value['product_image']; ?>" alt="Product Image" 
-                        onerror="this.onerror=null; this.src='assets/images/Placeholder.png';">
-                        <div>
-                            <p><?php echo $value['product_name']; ?></p>
-                            <small>Price: $<?php echo $value['product_price']; ?></small><br>
-
-                            <form method="POST" action="cart.php">
-                              <input type="hidden" name="product_id" value="<?php echo $value['product_id']; ?>">
-                              <input type="submit" name="remove_product" class="remove-btn" value="Remove">
-
-                            </form>
-                            <!--<a href="#">Remove</a>-->
-                        </div>
-                    </div>
-                </td>
-
-               <!-- Quantity -->
-                <td>
-                  <form method="POST" action="cart.php">
-                    <input type="hidden" name="product_id" value="<?php echo $value['product_id']; ?>">
-                    <input type="number" name="product_quantity" value="<?php echo $value['product_quantity']; ?>" min="1" max="10">
-                    <input type="submit" name="edit_quantity" class="edit-btn" value="Edit">
-                  </form>
-                </td>
-
-                <!-- Total Price-->
-                <td>
-                  <span>$</span>
-                  <span class="product-price"><?php echo $value['product_price'] * $value['product_quantity']; ?></span>
-                </td>
-            </tr>
-
-            <?php } ?>
+              <?php foreach($_SESSION['cart'] as $key => $value) { ?>
 
 
-        </table>
+              <tr>
+                  <td>
+                      <div class="product-info">
+                          <img src="assets/<?php echo $value['product_image']; ?>" alt="Product Image" 
+                          onerror="this.onerror=null; this.src='assets/images/Placeholder.png';">
+                          <div>
+                              <p><?php echo $value['product_name']; ?></p>
+                              <small>Price: $<?php echo $value['product_price']; ?></small><br>
 
-        <div class="cart-total">
-          <table>
-            <tr>
-              <td>Subtotal</td>
-              <td> <?php echo "$ " . number_format($_SESSION['cart_total'], 2);?> </td>
-            </tr>
-            <tr>
-              <td>Shipping</td>
-              <td><?php echo "$ " . number_format($_SESSION['cart_total'] * 0.0825, 2);?> </td>  
+                              <form method="POST" action="cart.php">
+                                <input type="hidden" name="product_id" value="<?php echo $value['product_id']; ?>">
+                                <input type="submit" name="remove_product" class="remove-btn" value="Remove">
+
+                              </form>
+                              <!--<a href="#">Remove</a>-->
+                          </div>
+                      </div>
+                  </td>
+
+                <!-- Quantity -->
+                  <td>
+                    <form method="POST" action="cart.php">
+                      <input type="hidden" name="product_id" value="<?php echo $value['product_id']; ?>">
+                      <input type="number" name="product_quantity" value="<?php echo $value['product_quantity']; ?>" min="1" max="10">
+                      <input type="submit" name="edit_quantity" class="edit-btn" value="Edit">
+                    </form>
+                  </td>
+
+                  <!-- Total Price-->
+                  <td>
+                    <span>$</span>
+                    <span class="product-price"><?php echo $value['product_price'] * $value['product_quantity']; ?></span>
+                  </td>
+              </tr>
+
+              <?php } ?>
+
+
           </table>
-        </div>
 
-        <div class="checkout-container">
-          <form method="POST" action="checkout.php">
-            <input type="hidden" name="cart_total" value="<?php echo $_SESSION['cart_total']; ?>">
-            <input type="submit" name="checkout" class="checkout-btn" value="Checkout">
-          </form>
-        </div>
+          <div class="cart-total">
+            <table>
+              <tr>
+                <td>Subtotal</td>
+                <td> <?php echo "$ " . number_format($_SESSION['cart_total'], 2);?> </td>
+              </tr>
+              <tr>
+                <td>Shipping</td>
+                <td><?php echo "$ " . number_format($_SESSION['cart_total'] * 0.0825, 2);?> </td>  
+            </table>
+          </div>
+
+          <div class="checkout-container">
+            <form method="POST" action="checkout.php">
+              <input type="hidden" name="cart_total" value="<?php echo $_SESSION['cart_total']; ?>">
+              <input type="submit" name="checkout" class="checkout-btn" value="Checkout">
+            </form>
+          </div>
         <?php } else { ?>
             <!-- Cart is empty - show empty cart message -->
             <div class="empty-cart mt-5 pt-5 text-center">
