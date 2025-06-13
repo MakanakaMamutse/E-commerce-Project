@@ -1,3 +1,5 @@
+/* Product Page Styles - Darker Text */
+
 .single-product input {
     width: 50px;
     height: 40px; 
@@ -8,7 +10,7 @@
 }
 
 .single-product .buy-btn {
-    background-color: green;
+    background-color: rgb(16, 54, 224);
     color: white;
 }
 
@@ -24,22 +26,98 @@
     flex-wrap: wrap;
 }
 
+/* Style for small images in the product page, made temp chnanges to test on mobile, fix coming later*/
 .small-img-col {
     flex: 0 1 calc(25% - 10px);
     aspect-ratio: 1 / 1;
-    max-height: 150px;
-    min-height: 80px;
+    max-height: 90px; 
+    min-height: 45px;
 }
 
 .small-img-col img {
-    width: 100%;
+    width: auto;
     height: 100%;
     object-fit: cover;
-    object-position: top;
+    object-position: center;
     border: 1px solid #ddd;
     transition: transform 0.3s ease;
 }
 
 .small-img-col img:hover {
     transform: scale(1.05);
+}
+
+/* Make all product page text darker and more readable */
+.single-product h6 {
+    color: #333 !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+
+.single-product h3 {
+    color: #222 !important;
+    font-weight: 700 !important;
+}
+
+.single-product h2 {
+    color: #333 !important;
+    font-weight: 700 !important;
+}
+
+.single-product h4 {
+    color: #333 !important;
+    font-weight: 600 !important;
+}
+
+.single-product span {
+    color: #444 !important;
+    font-weight: 500 !important;
+    line-height: 1.6 !important;
+}
+
+/* Style the Add to Cart button */
+.add-to-cart-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #26bd00;
+}
+
+/* Override Bootstrap text-muted classes if they exist */
+.single-product .text-muted {
+    color: #555 !important;
+}
+
+/* Make sure category text is visible */
+.single-product h6,
+.single-product .category {
+    color: #666 !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Product description styling */
+.single-product .product-description,
+.single-product span {
+    color: #000000 !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    line-height: 1.7 !important;
+}
+
+/* Price styling */
+.single-product h2 {
+    color: #28a745 !important; /* Make price green to stand out */
+    font-weight: 700 !important;
+    font-size: 2rem !important;
 }

@@ -213,8 +213,7 @@ if(isset($_POST['reset_session'])) {
 
                   <!-- Total Price-->
                   <td>
-                    <span>$</span>
-                    <span class="product-price"><?php echo $value['product_price'] * $value['product_quantity']; ?></span>
+                    <span class="product-price">$ <?php echo $value['product_price'] * $value['product_quantity']; ?></span>
                   </td>
               </tr>
 

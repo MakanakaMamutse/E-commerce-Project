@@ -23,6 +23,7 @@
     padding: 10px 20px;
     text-align: left;
     border-bottom: 1px solid #c9bdbd;
+    color: #333 !important; /* Force darker text for table cells */
 }
 
 .cart td img {
@@ -34,7 +35,7 @@
 
 .cart td input {
     width: 60px;
-    height: 40px; 
+    height: 40px;
     padding: 10px;
     font-weight: 600;
     font-size: 16px;
@@ -42,6 +43,20 @@
 
 .cart .product-info p {
     margin: 3px;
+    color: #333 !important; /* Force darker text for product names */
+    font-weight: 600 !important; /* Make product names bolder */
+}
+
+/* Make small text (price) much darker and more readable */
+.cart .product-info small {
+    color: #444 !important; /* Very dark gray for price text */
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+
+/* Force all text within product-info to be dark */
+.cart .product-info * {
+    color: #333 !important;
 }
 
 /* Cart Total */
@@ -59,10 +74,21 @@
     border-top: 3px solid #2a61d8;
 }
 
+/* Make cart total text darker */
+.cart-total td {
+    color: #0c24ff !important; /* Force darker text for subtotal and shipping */
+    font-weight: 600 !important;
+}
+
+/* Force all cart-total text to be dark */
+.cart-total * {
+    color: #333 !important;
+}
+
 /* Cart Action Buttons */
 .cart .edit-btn {
     color: rgb(44, 7, 255);
-    background-color: transparent; 
+    background-color: transparent;
     text-decoration: underline;
     font-size: 16px;
     text-align: left;
@@ -95,4 +121,28 @@ th:last-child {
 .checkout-container {
     display: flex;
     justify-content: flex-end;
+}
+
+/* Additional styling for better readability */
+.cart .product-price {
+    color: #333 !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+}
+
+/* Style the checkout button */
+.checkout-btn {
+    background-color: #2a61d8;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.checkout-btn:hover {
+    background-color: #1e4bb8;
 }

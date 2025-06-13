@@ -1,8 +1,6 @@
 <?php include('layouts/header.php'); ?>
 
-  <?php include('layouts/header.php'); ?>
-
-    <!--Home-->
+  <!--Home-->
   <section id="home">
         <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-indicators">
@@ -18,7 +16,7 @@
                         <h5>NEW ARRIVALS</h5>
                         <h1>Best Prices This season</h1>
                         <p>Get 50% off on selected items</p>
-                        <button class="btn btn-light">Shop Now</button>
+                        <button class="text-uppercase">Shop Now</button>
                     </div>
                 </div>
 
@@ -28,7 +26,7 @@
                         <h5>LIMITED TIME OFFER</h5>
                         <h1>Flash Sale on Footwear</h1>
                         <p>Up to 70% off on sneakers and boots!</p>
-                        <button class="btn btn-light">View Deals</button>
+                        <button class="text-uppercase">View Deals</button>
                     </div>
                 </div>
 
@@ -38,7 +36,7 @@
                         <h5>SUMMER COLLECTION</h5>
                         <h1>Fresh Styles for the Season</h1>
                         <p>Explore our latest apparel and accessories</p>
-                        <button class="btn btn-light">Discover More</button>
+                        <button class="text-uppercase">Discover More</button>
                     </div>
                 </div>
              </div>

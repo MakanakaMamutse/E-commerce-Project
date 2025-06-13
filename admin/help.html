@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help - M&M Sports Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+        <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            z-index: 1000;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 15px 25px;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 0;
+        }
+        
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .breadcrumb-item a {
+            color: #6c757d;
+            text-decoration: none;
+        }
+        
+        .content-wrapper {
+            padding: 0 2rem 2rem;
+        }
+        
+        .help-section {
+            background: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .help-section h3 {
+            color: #495057;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .faq-item {
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            background: #f8f9fa;
+            padding: 1rem;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background: #e9ecef;
+        }
+        
+        .faq-answer {
+            padding: 1rem;
+            display: none;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .contact-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .feature-card {
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            padding: 1.5rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .feature-icon {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-not-paid {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-delivered {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+   <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="p-4">
+            <h4 class="text-white mb-0">M&M Sports</h4>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="admin_dashboard.php">
+                    <i class="fas fa-tachometer-alt me-3"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="orders.php">
+                    <i class="fas fa-shopping-cart me-3"></i>Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="products.php">
+                    <i class="fas fa-box me-3"></i>Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="add_product.php">
+                    <i class="fas fa-plus-circle me-3"></i>Add New Product
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="account.php">
+                    <i class="fas fa-user-cog me-3"></i>Account
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="help.html">
+                    <i class="fas fa-question-circle me-3"></i>Help
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-0">Help Center</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="admin_dashboard.php">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Help</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="me-3">Admin</span>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="account.php">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content-wrapper">
+            <!-- Getting Started Section -->
+            <div class="help-section">
+                <h3><i class="fas fa-rocket me-2"></i>Getting Started</h3>
+                <p class="lead">Welcome to the M&M Sports Admin Panel! Here's everything you need to know to manage your sports equipment business effectively.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <h5>Dashboard Overview</h5>
+                        <p>Get a quick overview of your business performance, including recent orders, top products, and key metrics all in one place.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <h5>Order Management</h5>
+                        <p>Track, update, and manage all customer orders. View order details, update status, and handle customer communications.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <h5>Product Catalog</h5>
+                        <p>Manage your sports equipment inventory, update product information, prices, and availability status.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Management Help -->
+            <div class="help-section">
+                <h3><i class="fas fa-shopping-cart me-2"></i>Order Management Guide</h3>
+                
+                <h5>Understanding Order Status</h5>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-badge status-not-paid me-2">not paid</span>
+                            <span>Payment pending</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-badge status-paid me-2">paid</span>
+                            <span>Payment confirmed</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-badge status-delivered me-2">delivered</span>
+                            <span>Order completed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h5>How to Update Orders</h5>
+                <ol>
+                    <li>Navigate to the Orders page from the sidebar</li>
+                    <li>Find the order you want to update</li>
+                    <li>Click the blue "Edit" button in the actions column</li>
+                    <li>Update the order status or other details</li>
+                    <li>Save your changes</li>
+                </ol>
+            </div>
+
+            <!-- Product Management Help -->
+            <div class="help-section">
+                <h3><i class="fas fa-box me-2"></i>Product Management Guide</h3>
+                
+                <h5>Adding New Products</h5>
+                <ol>
+                    <li>Click "Add New Product" from the sidebar</li>
+                    <li>Fill in all required product information:
+                        <ul>
+                            <li>Product name and description</li>
+                            <li>Price and category</li>
+                            <li>Stock quantity</li>
+                            <li>Product images</li>
+                        </ul>
+                    </li>
+                    <li>Set the product status (active/inactive)</li>
+                    <li>Save the product</li>
+                </ol>
+
+                <h5>Managing Existing Products</h5>
+                <ul>
+                    <li>Use the Products page to view all items</li>
+                    <li>Edit product details by clicking the edit button</li>
+                    <li>Update stock levels regularly</li>
+                    <li>Deactivate products that are out of stock</li>
+                </ul>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="help-section">
+                <h3><i class="fas fa-question-circle me-2"></i>Frequently Asked Questions</h3>
+                
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>How do I process a refund for a customer?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>To process a refund:</p>
+                        <ol>
+                            <li>Locate the order in the Orders section</li>
+                            <li>Verify the refund request is valid</li>
+                            <li>Contact your payment processor to initiate the refund</li>
+                            <li>Update the order status to "refunded"</li>
+                            <li>Notify the customer about the refund processing</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>How do I update product inventory?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>To update inventory:</p>
+                        <ol>
+                            <li>Go to the Products page</li>
+                            <li>Find the product you want to update</li>
+                            <li>Click the edit button</li>
+                            <li>Update the stock quantity field</li>
+                            <li>Save the changes</li>
+                        </ol>
+                        <p>The system will automatically show "Out of Stock" when quantity reaches zero.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>What should I do if I can't access my account?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>If you're having trouble accessing your account:</p>
+                        <ul>
+                            <li>Check your username and password carefully</li>
+                            <li>Use the password reset feature if available</li>
+                            <li>Clear your browser cache and cookies</li>
+                            <li>Try using a different browser</li>
+                            <li>Contact technical support if the problem persists</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>How do I export order data?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>To export order data:</p>
+                        <ol>
+                            <li>Go to the Orders page</li>
+                            <li>Use the Filter button to select specific orders if needed</li>
+                            <li>Click the Export button</li>
+                            <li>Choose your preferred format (CSV, Excel)</li>
+                            <li>The file will be downloaded to your computer</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="help-section">
+                <div class="contact-card">
+                    <h3><i class="fas fa-headset me-2"></i>Need More Help?</h3>
+                    <p class="mb-4">Our support team is here to help you with any questions or issues you might have.</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5><i class="fas fa-envelope me-2"></i>Email Support</h5>
+                            <p>support@mmsports.com</p>
+                            <small>Response within 24 hours</small>
+                        </div>
+                        <div class="col-md-4">
+                            <h5><i class="fas fa-phone me-2"></i>Phone Support</h5>
+                            <p>+1 (555) 123-4567</p>
+                            <small>Mon-Fri, 9AM-6PM EST</small>
+                        </div>
+                        <div class="col-md-4">
+                            <h5><i class="fas fa-comments me-2"></i>Live Chat</h5>
+                            <p>Available in-app</p>
+                            <small>Mon-Fri, 9AM-6PM EST</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleFaq(button) {
+            const answer = button.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                answer.style.display = 'block';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+        
+        // Get current page filename
+        const currentPage = window.location.pathname.split('/').pop();
+
+        // Remove active class from all nav links
+        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // Add active class to current page link
+        const currentLink = document.querySelector(`.sidebar a[href="${currentPage}"]`);
+        if (currentLink) {
+            currentLink.classList.add('active');
+        }
+       
+    </script>
+</body>
+</html>

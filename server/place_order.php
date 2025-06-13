@@ -9,7 +9,7 @@ include_once 'connection.php';
     if(isset($_POST['place_order'])) {
 
 
-        // In your PHP
+        // --- Check if User is Logged In ---
         if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
             header("Location: ../login.php?login_required=1");
             exit();
@@ -31,7 +31,7 @@ include_once 'connection.php';
 
         // Hardcoded IDs for now (will be dynamic in a full application) user id set.
         $customer_id = $_SESSION['user_id']; 
-        $seller_id   = 2; // Required as 'seller_id' is NOT nullable in your DB.
+        $seller_id   = 6; // Required as 'seller_id' is NOT nullable in your DB.
         $payment_id  = null; // Set to null as payment processing is not yet implemented (DB column is nullable).
 
 

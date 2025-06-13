@@ -497,8 +497,8 @@ body.shop-page {
     
     /* Smaller product cards on mobile */
     .shop-page .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;              /* Tighter spacing */
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 10px;              /* Tighter spacing */
     }
     
     /* Full width sidebar on mobile */
@@ -520,7 +520,7 @@ body.shop-page {
     }
 
     .shop-page .product-image-container {
-        height: 200px;          /* Shorter image area */
+        height: 170px;          /* Shorter image area */
     }
     
     /* Always show action buttons on mobile (no hover) */

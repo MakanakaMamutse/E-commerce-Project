@@ -37,7 +37,7 @@ session_start();
       if (empty($errors)) {
           
           // Prepare SQL query to find user by email address only
-          // We don't include password in WHERE clause because we need to verify it separately
+          // I don't include password in WHERE clause because we need to verify it separately
           $login_sql = "SELECT user_id, username, email, password FROM users WHERE email = ? LIMIT 1";
           
           // Prepare statement to prevent SQL injection attacks
@@ -55,8 +55,8 @@ session_start();
                   // User exists - fetch their data from database
                   $user = $result->fetch_assoc();
                   
-                  // Now verify the plain text password against the stored hash
-                  // This is the secure way to check passwords - never store plain text passwords!
+                  // Now verifying the plain text password against the stored hash
+                  // This is the secure way to check passwords - we should never store plain text passwords!
                   if (password_verify($plain_password, $user['password'])) {
                       
                       // Authentication successful! Create user session to keep them logged in
