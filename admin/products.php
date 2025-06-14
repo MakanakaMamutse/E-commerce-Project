@@ -379,7 +379,7 @@ if (isset($_GET['logout'])) {
 
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <button class="btn btn-outline-primary" title="Edit" onclick="editProduct('IPH15P001')">
+                                                <button class="btn btn-outline-primary" title="Edit" onclick="editProduct(<?php echo $product['product_id']; ?>)">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <button class="btn btn-outline-danger" title="Delete" onclick="deleteProduct('IPH15P001')">
@@ -446,10 +446,9 @@ if (isset($_GET['logout'])) {
         }
 
         // Edit product function
-        function editProduct(sku) {
-            // In a real application, this would redirect to an edit page or open a modal
-            console.log('Editing product with SKU:', sku);
-            alert(`Edit product ${sku} (This would open an edit form in a real application)`);
+        function editProduct(productID) {
+            // Redirect to edit product page with the product ID as a parameter
+            window.location.href = 'edit_product.php?id=' + productId;
         }
 
         // Delete product function
