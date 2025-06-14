@@ -1,7 +1,7 @@
 <?php
-
     // Include database connection
-  include('../server/connection.php');
+    include('../server/connection.php');
+    
     // Fetch product details by ID
     $productId = $_GET['id'] ?? null;
     $sql = "SELECT * FROM products WHERE product_id = ?";
@@ -15,18 +15,7 @@
     } else {
         die("Product not found.");
     }
-
-
-
-
-
-
-
-
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -36,139 +25,9 @@
     <title>Edit Product</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .top-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 0;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-        
-        .nav-link {
-            color: #667eea;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        
-        .nav-link:hover {
-            color: #764ba2;
-            transform: translateY(-1px);
-        }
-        
-        .main-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            overflow: hidden;
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 2rem;
-            border: none;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-control, .form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.8);
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.15);
-            background: white;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-        
-        .form-floating {
-            margin-bottom: 1.5rem;
-        }
-        
-        .alert {
-            border-radius: 12px;
-            border: none;
-            padding: 1rem 1.5rem;
-        }
-        
-        .alert-success {
-            background: linear-gradient(135deg, #d4edda, #c3e6cb);
-            color: #155724;
-        }
-        
-        .breadcrumb {
-            background: none;
-            padding: 0;
-            margin-bottom: 1rem;
-        }
-        
-        .breadcrumb-item a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        
-        .breadcrumb-item.active {
-            color: #6c757d;
-        }
-        
-        .product-id-display {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 16px;
-            color: #6c757d;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin/edit_product.css">
 </head>
+
 <body>
     <!-- Top Navigation -->
     <nav class="top-nav">
@@ -205,10 +64,17 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <!-- Success Alert -->
-                <div class="alert alert-success d-flex align-items-center mb-4" role="alert" style="display: none;" id="successAlert">
+                <div class="alert alert-success d-flex align-items-center mb-4 d-none" role="alert" id="successAlert">
                     <i class="fas fa-check-circle me-3"></i>
-                    <div>Product has been updated successfully!</div>
+                    <div id="successMessage">Product has been updated successfully!</div>
                     <button type="button" class="btn-close ms-auto" onclick="hideAlert()"></button>
+                </div>
+
+                <!-- Error Alert -->
+                <div class="alert alert-danger d-flex align-items-center mb-4 d-none" role="alert" id="errorAlert">
+                    <i class="fas fa-exclamation-circle me-3"></i>
+                    <div id="errorMessage">An error occurred while updating the product.</div>
+                    <button type="button" class="btn-close ms-auto" onclick="hideErrorAlert()"></button>
                 </div>
 
                 <!-- Edit Product Form -->
@@ -228,7 +94,7 @@
                                     <label for="productId" class="form-label">
                                         <i class="fas fa-hashtag me-1"></i>Product ID
                                     </label>
-                                    <div class="product-id-display" id="productId"> <?php echo $product['product_id'] ?> </div>
+                                    <div class="product-id-display" id="productId"><?php echo $product['product_id']; ?></div>
                                 </div>
 
                                 <!-- Seller ID (Read-only) -->
@@ -236,7 +102,7 @@
                                     <label for="sellerId" class="form-label">
                                         <i class="fas fa-user me-1"></i>Seller ID
                                     </label>
-                                    <div class="product-id-display" id="sellerId"><?php echo $product['seller_id'] ?></div>
+                                    <div class="product-id-display" id="sellerId"><?php echo $product['seller_id']; ?></div>
                                 </div>
                             </div>
 
@@ -248,11 +114,11 @@
                                     </label>
                                     <select class="form-select" id="categoryId" required>
                                         <option value="">Select Category</option>
-                                        <option value="1" selected>Club Shirts</option>
-                                        <option value="2">National Team Shirts</option>
-                                        <option value="3">Footballs</option>
-                                        <option value="4">Gear</option>
-                                        <option value="5">Football Boots</option>
+                                        <option value="1" <?php echo ($product['category_id'] == 1) ? 'selected' : ''; ?>>Club Shirts</option>
+                                        <option value="2" <?php echo ($product['category_id'] == 2) ? 'selected' : ''; ?>>National Team Shirts</option>
+                                        <option value="3" <?php echo ($product['category_id'] == 3) ? 'selected' : ''; ?>>Footballs</option>
+                                        <option value="4" <?php echo ($product['category_id'] == 4) ? 'selected' : ''; ?>>Gear</option>
+                                        <option value="5" <?php echo ($product['category_id'] == 5) ? 'selected' : ''; ?>>Football Boots</option>
                                     </select>
                                 </div>
 
@@ -263,7 +129,7 @@
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="price" step="0.01" min="0" value="<?php echo $product['price'] ?>" required>
+                                        <input type="number" class="form-control" id="price" step="0.01" min="0" value="<?php echo $product['price']; ?>" required>
                                     </div>
                                 </div>
                             </div>
@@ -273,7 +139,7 @@
                                 <label for="productName" class="form-label">
                                     <i class="fas fa-box me-1"></i>Product Name
                                 </label>
-                                <input type="text" class="form-control" id="productName" value="<?php echo $product['product_name'] ?>" required>
+                                <input type="text" class="form-control" id="productName" value="<?php echo htmlspecialchars($product['product_name']); ?>" required>
                             </div>
 
                             <!-- Description -->
@@ -281,17 +147,25 @@
                                 <label for="description" class="form-label">
                                     <i class="fas fa-align-left me-1"></i>Description
                                 </label>
-                                <textarea class="form-control" id="description" rows="4" placeholder="<?php echo htmlspecialchars($product['description']); ?>" required></textarea>
+                                <textarea class="form-control" id="description" rows="4" required><?php echo htmlspecialchars($product['description']); ?></textarea>
                             </div>
 
                             <!-- Action Buttons -->
-                            <div class="d-flex gap-3 justify-content-end">
-                                <a href="products.html" class="btn btn-secondary">
-                                    <i class="fas fa-times me-2"></i>Cancel
-                                </a>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>Update Product
-                                </button>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>
+                                    <strong>Last Updated:</strong> 
+                                    <span class="text-muted" id="lastUpdated">
+                                        <?php echo date('Y-m-d H:i:s', strtotime($product['updated_at'])); ?>
+                                    </span>
+                                </span>
+                                <div class="d-flex gap-3">
+                                    <a href="products.php" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary" id="updateBtn">
+                                        <i class="fas fa-save me-2"></i>Update Product
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -305,38 +179,74 @@
     
     <!-- Custom JavaScript -->
     <script>
-        function updateProduct(event) {
+        async function updateProduct(event) {
             event.preventDefault();
+            
+            // Show loading state
+            const updateBtn = document.getElementById('updateBtn');
+            const originalBtnText = updateBtn.innerHTML;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+            updateBtn.disabled = true;
             
             // Get form data
             const formData = {
-                productId: document.getElementById('productId').textContent,
-                sellerId: document.getElementById('sellerId').textContent,
-                categoryId: document.getElementById('categoryId').value,
-                productName: document.getElementById('productName').value,
-                description: document.getElementById('description').value,
-                price: document.getElementById('price').value
+                productId: parseInt(document.getElementById('productId').textContent.trim()),
+                sellerId: parseInt(document.getElementById('sellerId').textContent.trim()),
+                categoryId: parseInt(document.getElementById('categoryId').value),
+                productName: document.getElementById('productName').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                price: parseFloat(document.getElementById('price').value)
             };
             
             // Validate form
-            if (!formData.categoryId || !formData.productName.trim() || 
-                !formData.description.trim() || !formData.price) {
-                alert('Please fill in all required fields.');
+            if (!formData.categoryId || !formData.productName || 
+                !formData.description || !formData.price) {
+                showErrorAlert('Please fill in all required fields.');
+                resetButton(updateBtn, originalBtnText);
                 return;
             }
             
-            // Here you would typically send the data to your backend
-            console.log('Updating product with data:', formData);
-            
-            // Show success message
-            showSuccessAlert();
-            
-            // In a real application, you might redirect after a delay
-            // setTimeout(() => window.location.href = 'products.html', 2000);
+            try {
+                // Send AJAX request to PHP backend
+                const response = await fetch('update_product.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccessAlert(result.message);
+                    //Redirect after success
+                    setTimeout(() => {
+                        window.location.href = 'products.php';
+                    }, 6000);
+                } else {
+                    showErrorAlert(result.message || 'Failed to update product.');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showErrorAlert('Network error occurred. Please try again.');
+            } finally {
+                resetButton(updateBtn, originalBtnText);
+            }
         }
         
-        function showSuccessAlert() {
+        function resetButton(button, originalText) {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+        
+        function showSuccessAlert(message) {
+            hideErrorAlert();
             const alert = document.getElementById('successAlert');
+            const messageDiv = document.getElementById('successMessage');
+            messageDiv.textContent = message;
+            alert.classList.remove('d-none');
             alert.style.display = 'flex';
             
             // Auto-hide after 5 seconds
@@ -345,12 +255,38 @@
             }, 5000);
         }
         
+        function showErrorAlert(message) {
+            hideAlert();
+            const alert = document.getElementById('errorAlert');
+            const messageDiv = document.getElementById('errorMessage');
+            messageDiv.textContent = message;
+            alert.classList.remove('d-none'); // Removing the hiding class
+            alert.style.display = 'flex';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                hideErrorAlert();
+            }, 5000);
+        }
+        
         function hideAlert() {
             const alert = document.getElementById('successAlert');
-            alert.style.transition = 'opacity 0.5s';
+            alert.style.transition = 'opacity 0.7s';
             alert.style.opacity = '0';
             setTimeout(() => {
-                alert.style.display = 'none';
+                alert.classList.add('d-none'); // Adding the hiding class back
+                //alert.style.display = 'none';
+                alert.style.opacity = '1';
+            }, 500);
+        }
+        
+        function hideErrorAlert() {
+            const alert = document.getElementById('errorAlert');
+            alert.style.transition = 'opacity 0.7s';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                alert.classList.add('d-none'); // Add the hiding class back
+                //alert.style.display = 'none';
                 alert.style.opacity = '1';
             }, 500);
         }

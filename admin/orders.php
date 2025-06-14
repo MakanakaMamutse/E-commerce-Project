@@ -138,23 +138,6 @@
             background: #667eea;
             border-color: #667eea;
         }
-        /* Sidebar menu styles */
-        .sidebar-brand {
-            padding: 20px 15px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            text-decoration: none;
-            display: block;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .sidebar .nav {
-            flex-direction: column;
-            padding-top: 20px;
-        }
-        .sidebar .nav-item {
-            width: 100%;
-        }
     </style>
 </head>
 <body class="bg-light">
