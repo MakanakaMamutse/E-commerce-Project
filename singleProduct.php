@@ -10,6 +10,7 @@ if(isset($_GET['product_id'])) {
       "SELECT 
           p.*, 
           pi.image_url, 
+          u.full_name as seller_name,
           c.category_name
       FROM 
           products p
@@ -17,6 +18,8 @@ if(isset($_GET['product_id'])) {
           product_images pi ON p.product_id = pi.product_id
       LEFT JOIN 
           categories c ON p.category_id = c.category_id
+      LEFT JOIN 
+            users u ON p.seller_id = u.user_id
       WHERE 
           p.product_id = ?";
 
@@ -109,6 +112,25 @@ else {
                 
                 <h4 class="mt-5 mb-5">Product Details</h4>
                 <span><?php echo $product_data['description']; ?></span>
+
+                <!-- Seller Information Section -->
+                <div class="seller-info mt-4 p-4 border-0 rounded-3 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-left: 8px solid #007bff !important; max-width: 300px;">
+                    <div class="d-flex align-items-center">
+                        <div class="seller-icon-wrapper me-3 d-flex align-items-center justify-content-center rounded-circle" 
+                             style="width: 50px; height: 50px; background: linear-gradient(135deg, #007bff, #0056b3); box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);">
+                            <i class="fas fa-store text-white" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1 text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Sold by</h6>
+                            <p class="mb-0 fw-bold" style="font-size: 1.1rem; color: #343a40;"><?php $seller_name = (!empty($product_data['seller_name'])) ? $product_data['seller_name'] : 'Individual Seller';echo htmlspecialchars($seller_name, ENT_QUOTES, 'UTF-8'); ?></p>
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1" style="color: #28a745;"></i>
+                                Verified Seller
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         <?php } else { ?>
             <div class="col-12">
