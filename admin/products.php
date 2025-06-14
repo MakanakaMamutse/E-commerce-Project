@@ -382,7 +382,7 @@ if (isset($_GET['logout'])) {
                                                 <button class="btn btn-outline-primary" title="Edit" onclick="editProduct(<?php echo $product['product_id']; ?>)">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button class="btn btn-outline-danger" title="Delete" onclick="deleteProduct('IPH15P001')">
+                                                <button class="btn btn-outline-danger" title="Delete" onclick="deleteProduct(<?php echo $product['product_id']; ?>)">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -393,6 +393,8 @@ if (isset($_GET['logout'])) {
                         </table>
                     </div>
                 </div>
+
+                <!-- Pagination -->
                 <div class="card-footer bg-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -453,10 +455,10 @@ if (isset($_GET['logout'])) {
         }
 
         // Delete product function
-        function deleteProduct(sku) {
-            if (confirm(`Are you sure you want to delete product ${sku}?`)) {
+        function deleteProduct(ProductID) {
+            if (confirm(`Are you sure you want to delete product ${ProductID}?`)) {
                 // In a real application, this would make an API call to delete the product
-                console.log('Deleting product with SKU:', sku);
+                console.log('Deleting product with ID:', ProductID);
                 alert(`Product ${sku} deleted! (This would remove the product in a real application)`);
             }
         }

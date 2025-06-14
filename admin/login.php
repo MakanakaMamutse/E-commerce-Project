@@ -39,7 +39,7 @@ session_start();
           
            // Prepare SQL query to find user and their role
     // Join users table with user_roles table to get role information
-    $login_sql = "SELECT u.user_id, u.username, u.email, u.password, ur.role_type 
+    $login_sql = "SELECT u.*, ur.role_type
                   FROM users u 
                   LEFT JOIN user_roles ur ON u.user_id = ur.user_id 
                   WHERE u.email = ? LIMIT 1";
@@ -66,8 +66,11 @@ session_start();
                      if ($user['role_type'] == 'admin' || $user['role_type'] == 'seller') {
                         // Authentication successful! Create user session
                         $_SESSION['user_id'] = $user['user_id'];
+                        $_SESSION['full_name'] = $user['full_name'];
                         $_SESSION['username'] = $user['username'];
                         $_SESSION['email'] = $user['email'];
+                        $_SESSION['phone_number'] = $user['phone_number'];
+                        $_SESSION['registration_date'] = $user['registration_date'];
                         $_SESSION['role_type'] = $user['role_type']; // Store role in session
                         $_SESSION['login_status'] = true;
                         

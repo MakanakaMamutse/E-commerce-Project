@@ -1,3 +1,26 @@
+<?php
+// Start the session
+session_start();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,8 +137,18 @@
                         <div class="profile-avatar mx-auto mb-3" style="width: 120px; height: 120px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                             <i class="fas fa-user-shield fa-3x text-white"></i>
                         </div>
-                        <h4 class="mb-1">John Smith</h4>
-                        <p class="text-muted mb-3">Super Administrator</p>
+                        <h4 class="mb-1"><?php echo $_SESSION['full_name'] ?></h4>
+                        <p class="text-muted mb-3"> 
+                            <?php 
+                                if ($_SESSION['role_type'] == 'admin') {
+                                    echo 'Super Administrator';
+                                } elseif ($_SESSION['role_type'] == 'seller') {
+                                    echo 'Individual Vendor';
+                                } else {
+                                    echo $_SESSION['role_type']; // Fallbacks to original value
+                                }
+                            ?>
+                        </p>
                         <span class="badge bg-success mb-3">Active</span>
                         <div class="d-grid">
                             <button class="btn btn-outline-primary">Change Avatar</button>
@@ -148,7 +181,7 @@
                         </div>
                         <div class="d-flex justify-content-between mt-2">
                             <span class="text-muted">Account Created:</span>
-                            <span>Jan 15, 2023</span>
+                            <span><?php echo $_SESSION['registration_date'] ?></span>
                         </div>
                     </div>
                 </div>
@@ -168,29 +201,69 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Full Name</label>
-                                <div class="form-control-plaintext">John Smith</div>
+                                <div class="form-control-plaintext"><?php echo $_SESSION['full_name'] ?></div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Email Address</label>
-                                <div class="form-control-plaintext">john.smith@company.com</div>
+                                <div class="form-control-plaintext"><?php echo $_SESSION['email'] ?></div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Phone Number</label>
-                                <div class="form-control-plaintext">+1 (555) 123-4567</div>
+                                <div class="form-control-plaintext"><?php echo $_SESSION['phone_number'] ?></div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Role</label>
                                 <div class="form-control-plaintext">
-                                    <span class="badge bg-danger">Super Administrator</span>
+                                    <?php 
+                                        if ($_SESSION['role_type'] == 'admin') {
+                                            echo '<span class="badge bg-danger">Admin</span>';
+                                        } elseif ($_SESSION['role_type'] == 'seller') {
+                                            echo '<span class="badge bg-success">Seller</span>';
+                                        } else {
+                                            echo '<span class="badge bg-secondary">' . $_SESSION['role_type'] . '</span>';
+                                        }
+                                    ?>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Department</label>
-                                <div class="form-control-plaintext">IT & Operations</div>
+                                <label class="form-label text-muted">
+                                    <?php 
+                                    if ($_SESSION['role_type'] == 'admin') {
+                                        echo 'Department';
+                                    } elseif ($_SESSION['role_type'] == 'seller') {
+                                        echo 'Username';
+                                    } else {
+                                        echo 'Department';
+                                    }
+                                    ?>
+                                </label>
+                                <div class="form-control-plaintext">
+                                    <?php 
+                                    if ($_SESSION['role_type'] == 'admin') {
+                                        echo 'IT & Operations';
+                                    } elseif ($_SESSION['role_type'] == 'seller') {
+                                        echo $_SESSION['username'];
+                                    } else {
+                                        echo 'IT & Operations';
+                                    }
+                                    ?>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Employee ID</label>
-                                <div class="form-control-plaintext">EMP001</div>
+                                <label class="form-label text-muted">
+                                    <?php 
+                                    if ($_SESSION['role_type'] == 'admin') {
+                                        echo 'Employee ID';
+                                    } elseif ($_SESSION['role_type'] == 'seller') {
+                                        echo 'User ID';
+                                    } else {
+                                        echo 'Employee ID';
+                                    }
+                                    ?>
+                                </label>
+                                <div class="form-control-plaintext">
+                                    <?php echo $_SESSION['user_id'] ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -270,7 +343,13 @@
                                             <i class="fas fa-users text-primary me-2"></i>
                                             <span>User Management</span>
                                         </div>
-                                        <span class="badge bg-success">Full Access</span>
+                                        <?php 
+                                        if ($_SESSION['role_type'] == 'admin') {
+                                            echo '<span class="badge bg-success">Full Access</span>';
+                                        } else {
+                                            echo '<span class="badge bg-danger">Restricted</span>';
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                             </div>
@@ -314,7 +393,13 @@
                                             <i class="fas fa-cog text-primary me-2"></i>
                                             <span>System Settings</span>
                                         </div>
-                                        <span class="badge bg-success">Full Access</span>
+                                        <?php 
+                                        if ($_SESSION['role_type'] == 'admin') {
+                                            echo '<span class="badge bg-success">Full Access</span>';
+                                        } else {
+                                            echo '<span class="badge bg-danger">Restricted</span>';
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                             </div>
@@ -325,7 +410,13 @@
                                             <i class="fas fa-database text-primary me-2"></i>
                                             <span>Database Access</span>
                                         </div>
-                                        <span class="badge bg-warning">Limited</span>
+                                        <?php 
+                                        if ($_SESSION['role_type'] == 'admin') {
+                                            echo '<span class="badge bg-warning">Limited</span>';
+                                        } else {
+                                            echo '<span class="badge bg-warning">Limited</span>';
+                                        }
+                                        ?>
                                     </div>
                                 </div>
                             </div>
