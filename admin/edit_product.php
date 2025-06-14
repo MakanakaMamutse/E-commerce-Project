@@ -1,3 +1,33 @@
+<?php
+
+    // Include database connection
+  include('../server/connection.php');
+    // Fetch product details by ID
+    $productId = $_GET['id'] ?? null;
+    $sql = "SELECT * FROM products WHERE product_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $productId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $product = $result->fetch_assoc();
+    } else {
+        die("Product not found.");
+    }
+
+
+
+
+
+
+
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,12 +178,12 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item">
-                                <a href="dashboard.html">
+                                <a href="admin_dashboard.php">
                                     <i class="fas fa-home me-1"></i>Dashboard
                                 </a>
                             </li>
                             <li class="breadcrumb-item">
-                                <a href="products.html">
+                                <a href="products.php">
                                     <i class="fas fa-box me-1"></i>Products
                                 </a>
                             </li>
@@ -162,7 +192,7 @@
                     </nav>
                 </div>
                 <div>
-                    <a href="products.html" class="nav-link">
+                    <a href="products.php" class="nav-link">
                         <i class="fas fa-arrow-left me-2"></i>Back to Products
                     </a>
                 </div>
@@ -198,7 +228,7 @@
                                     <label for="productId" class="form-label">
                                         <i class="fas fa-hashtag me-1"></i>Product ID
                                     </label>
-                                    <div class="product-id-display" id="productId">29</div>
+                                    <div class="product-id-display" id="productId"> <?php echo $product['product_id'] ?> </div>
                                 </div>
 
                                 <!-- Seller ID (Read-only) -->
@@ -206,7 +236,7 @@
                                     <label for="sellerId" class="form-label">
                                         <i class="fas fa-user me-1"></i>Seller ID
                                     </label>
-                                    <div class="product-id-display" id="sellerId">6</div>
+                                    <div class="product-id-display" id="sellerId"><?php echo $product['seller_id'] ?></div>
                                 </div>
                             </div>
 
@@ -233,7 +263,7 @@
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="price" step="0.01" min="0" value="44.99" required>
+                                        <input type="number" class="form-control" id="price" step="0.01" min="0" value="<?php echo $product['price'] ?>" required>
                                     </div>
                                 </div>
                             </div>
@@ -243,7 +273,7 @@
                                 <label for="productName" class="form-label">
                                     <i class="fas fa-box me-1"></i>Product Name
                                 </label>
-                                <input type="text" class="form-control" id="productName" value="Puma FINAL 4 Futsal Ball" required>
+                                <input type="text" class="form-control" id="productName" value="<?php echo $product['product_name'] ?>" required>
                             </div>
 
                             <!-- Description -->
@@ -251,7 +281,7 @@
                                 <label for="description" class="form-label">
                                     <i class="fas fa-align-left me-1"></i>Description
                                 </label>
-                                <textarea class="form-control" id="description" rows="4" required>Specially designed low-bounce futsal ball with excellent control and durability. Perfect for indoor play and training sessions.</textarea>
+                                <textarea class="form-control" id="description" rows="4" placeholder="<?php echo htmlspecialchars($product['description']); ?>" required></textarea>
                             </div>
 
                             <!-- Action Buttons -->

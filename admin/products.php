@@ -448,7 +448,8 @@ if (isset($_GET['logout'])) {
         // Edit product function
         function editProduct(productID) {
             // Redirect to edit product page with the product ID as a parameter
-            window.location.href = 'edit_product.php?id=' + productId;
+            console.log("Editing product with ID:", productID);
+            window.location.href = 'edit_product.php?id=' + productID;
         }
 
         // Delete product function
