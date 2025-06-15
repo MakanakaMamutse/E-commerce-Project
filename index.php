@@ -114,9 +114,9 @@
             <i class="fas fa-star"></i>
           </div>
 
-          <h5 class="p-name"> <?php echo $row['product_name']; ?> </h5>
-          <h4 class="p-price">$ <?php echo $row['price']; ?> </h4>
-          <p>Get the best shoes on the market</p>
+          <h5 class="p-name mt-1"> <?php echo $row['product_name']; ?> </h5>
+          <h4 class="p-price">$<?php echo $row['price']; ?> </h4>
+          <p>Get the best shirts on the market</p>
           <a href="singleProduct.php?product_id=<?php echo $row['product_id']; ?>" class="buy-btn">Buy Now</a>
         </div>
 
