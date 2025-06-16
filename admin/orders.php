@@ -1,3 +1,121 @@
+<?php
+
+// Database connection
+include('../server/connection.php');
+
+session_start();
+
+ // Check if the user is logged in
+    if (!isset($_SESSION['login_status'])) {
+        // User is not logged in, redirect to the login page
+        header("Location: login.php");
+        exit();
+    }
+
+
+
+// Handle user logout functionality
+    if (isset($_GET['logout'])) {
+        if (isset($_SESSION['login_status'])) {
+            unset($_SESSION['login_status']);
+            unset($_SESSION['username']);
+            unset($_SESSION['email']);
+            unset($_SESSION['user_id']);
+            unset($_SESSION['role_type']);
+
+            // Redirect to login page after logout
+            header("Location: login.php");
+            exit();
+        }
+    }
+
+ 
+    if($_SESSION['role_type'] == 'admin') {
+        // Admin sees all orders
+        $orderQuery = "SELECT 
+            o.order_id,
+            o.order_status,
+            o.order_date,
+            o.full_name as customer_name,
+            o.phone_number,
+            o.shipping_address,
+            o.city,
+            o.state_province,
+            o.zip_postal_code,
+            o.payment_method,
+            oi.product_id,
+            oi.quantity,
+            p.product_name,
+            p.seller_id,
+            u.email as seller_email
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        JOIN users u ON p.seller_id = u.user_id
+        ORDER BY o.order_date DESC";
+        
+        $stmt = $conn->prepare($orderQuery);
+        
+        if ($stmt) {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            // Fetch all results into an array
+            while ($row = $result->fetch_assoc()) {
+                $orders[] = $row;
+            }
+            $stmt->close();
+        } else {
+            $errors['general'] = "Failed to retrieve orders. Please try again.";
+        }
+        
+    } else if($_SESSION['role_type'] == 'seller') {
+        // Seller sees only their orders
+        $orderQuery = "SELECT 
+            o.order_id,
+            o.order_status,
+            o.order_date,
+            o.full_name as customer_name,
+            o.phone_number,
+            o.shipping_address,
+            o.city,
+            o.state_province,
+            o.zip_postal_code,
+            o.payment_method,
+            oi.product_id,
+            oi.quantity,
+            p.product_name,
+            p.seller_id,
+            u.email as seller_email
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        JOIN users u ON p.seller_id = u.user_id
+        WHERE p.seller_id = ?
+        ORDER BY o.order_date DESC";
+        
+        $stmt = $conn->prepare($orderQuery);
+        
+        if ($stmt) {
+            $stmt->bind_param("i", $_SESSION['user_id']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            // Fetch all results into an array
+            while ($row = $result->fetch_assoc()) {
+                $orders[] = $row;
+            }
+            $stmt->close();
+        } else {
+            $errors['general'] = "Failed to retrieve orders. Please try again.";
+        }
+    }
+
+
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -167,7 +285,7 @@
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
                         <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="login.html"><i class="fas fa-sign-out-alt me-2"></i>Sign out</a></li>
+                        <li><a class="dropdown-item" href="orders.php?logout=1"><i class="fas fa-sign-out-alt me-2"></i>Sign out</a></li>
                     </ul>
                 </div>
             </div>
@@ -201,8 +319,9 @@
                             <thead>
                                 <tr>
                                     <th>Order Id</th>
+                                    <th>Product</th>
                                     <th>Order Status</th>
-                                    <th>User Id</th>
+                                    <th>Customer Name</th>
                                     <th>Order Date</th>
                                     <th>User Phone</th>
                                     <th>User Address</th>
@@ -211,31 +330,52 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><strong>5</strong></td>
-                                    <td><span class="status-badge status-not-paid">not paid</span></td>
-                                    <td>1</td>
-                                    <td>2029-08-15 12:59:52</td>
-                                    <td>12345678</td>
-                                    <td>San Diego</td>
-                                    <td>
-                                        <button class="btn btn-edit">
-                                            <i class="fas fa-edit me-1"></i>Edit
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-delete" onclick="confirmDelete(5)">
-                                            <i class="fas fa-trash me-1"></i>Delete
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
+                                <?php if (!empty($orders)): ?>
+                                    <?php foreach ($orders as $order): ?>   
+                                        <tr>
+                                            <td><strong><?php echo htmlspecialchars($order['order_id']); ?></strong></td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-light rounded me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                                        <img class="logo" src="../assets/<?php echo htmlspecialchars($product['image_url']); ?>" alt="Product Image" style="max-width: 100%; height: auto;" onerror="this.onerror=null; this.src='../assets/images/Placeholder.png';">
+                                                        
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0"><?php echo htmlspecialchars($order['product_name']); ?></h6>
+                                                        <small class="text-muted"><?php echo htmlspecialchars($order['product_id']); ?></small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="status-badge status-not-paid"><?php echo htmlspecialchars($order['order_status']); ?></span></td>
+                                            <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
+                                            <td><?php echo date('Y-m-d H:i', strtotime($order['order_date'])); ?></td>
+                                            <td><?php echo htmlspecialchars($order['phone_number']); ?></td>
+                                            <td><?php echo $order['state_province']; ?></td> 
+                                            <td>
+                                                <button class="btn btn-edit">
+                                                    <i class="fas fa-edit me-1"></i>Edit
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-delete" onclick="confirmDelete(5)">
+                                                    <i class="fas fa-trash me-1"></i>Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="10" class="text-center">No orders found</td>
+                                    </tr>
+                                <?php endif; ?>
+
+                                <!-- <tr> 
                                     <td><strong>6</strong></td>
                                     <td><span class="status-badge status-delivered">delivered</span></td>
                                     <td>1</td>
                                     <td>2029-08-15 12:59:52</td>
                                     <td>123456789</td>
-                                    <td>San Diego</td>
+                                    <td>Bloemfontein</td>
                                     <td>
                                         <button class="btn btn-edit">
                                             <i class="fas fa-edit me-1"></i>Edit
@@ -253,7 +393,7 @@
                                     <td>2</td>
                                     <td>2029-08-16 09:30:15</td>
                                     <td>987654321</td>
-                                    <td>Los Angeles</td>
+                                    <td>Bloemfontein</td>
                                     <td>
                                         <button class="btn btn-edit">
                                             <i class="fas fa-edit me-1"></i>Edit
@@ -271,7 +411,7 @@
                                     <td>3</td>
                                     <td>2029-08-16 14:20:30</td>
                                     <td>555123456</td>
-                                    <td>New York</td>
+                                    <td>Bloemfontein</td>
                                     <td>
                                         <button class="btn btn-edit">
                                             <i class="fas fa-edit me-1"></i>Edit
@@ -289,7 +429,7 @@
                                     <td>4</td>
                                     <td>2029-08-17 11:45:22</td>
                                     <td>444555666</td>
-                                    <td>Chicago</td>
+                                    <td>Bloemfontein</td>
                                     <td>
                                         <button class="btn btn-edit">
                                             <i class="fas fa-edit me-1"></i>Edit
@@ -300,7 +440,7 @@
                                             <i class="fas fa-trash me-1"></i>Delete
                                         </button>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </tbody>
                         </table>
                     </div>

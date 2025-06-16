@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->execute()) {
             $product_id = $conn->insert_id; // Get inserted product ID
 
-            // ✅ Now insert into product_images table
+            // Now insert into product_images table
             if (!empty($image_url)) {
                 $imgStmt = $conn->prepare("INSERT INTO product_images (product_id, image_url) VALUES (?, ?)");
                 $imgStmt->bind_param("is", $product_id, $image_url);

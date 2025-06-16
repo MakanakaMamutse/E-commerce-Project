@@ -1,10 +1,8 @@
 <?php
 
-
-session_start();
-
-  // Include database connection
+// Include database connection
   include('../server/connection.php');
+session_start();
 
   //If the Admin is already logged in, redirect them to the admin dashboard
   // This prevents unauthorized access to the login page, else seller must re-login

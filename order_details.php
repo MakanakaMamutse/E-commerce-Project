@@ -103,7 +103,7 @@
                 <tr>
                     <td>
                         <div class="product-info">
-                            <img src="assets/<?php echo htmlspecialchars($item['image_url']); ?>" alt="Product Image">
+                            <img src="assets/<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['product_name']); ?>" onerror="this.onerror=null; this.src='assets/images/Placeholder.png';">
                             <div>
                                 <p><?php echo htmlspecialchars($item['product_name']); ?></p>
                                 <small>Price: $<?php echo number_format($item['price_at_purchase'], 2); ?></small><br>
