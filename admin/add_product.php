@@ -1,3 +1,100 @@
+<?php
+
+session_start();
+// Check if user is logged in
+// Database connection
+include('../server/connection.php');
+
+$message = "";
+$messageType = "";
+
+// Get categories for dropdown
+$categories = [];
+$result = $conn->query("SELECT category_id, category_name FROM categories ORDER BY category_id");
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $categories[] = $row;
+    }
+}
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $product_name = $_POST['product_name'];
+    $category_id = $_POST['category_id'];
+    $product_description = $_POST['product_description'];
+    $product_price = $_POST['product_price'];
+    $seller_id = $_SESSION['user_id']; 
+
+    // Get category name for folder structure
+    $category_name = "";
+    foreach($categories as $cat) {
+        if($cat['category_id'] == $category_id) {
+            $category_name = $cat['category_name'];
+            break;
+        }
+    }
+    
+    // Handle image upload
+    $image_url = "";
+    if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] == 0) {
+        $relative_path = "images/" . strtolower(str_replace(' ', '-', $category_name)) . "/"; // This is what's saved to DB
+        $target_dir = "../assets/" . $relative_path; // Full upload path on disk
+        
+        // Create directory if it doesn't exist
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true); //Sets full permissions (read/write/execute for all)
+        }
+        
+        $file_extension = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
+        $safe_filename = strtolower(str_replace(' ', '-', $product_name)) . '.' . $file_extension;
+        $target_file = $target_dir . $safe_filename;
+        
+        // Check if image file is actual image
+        $check = getimagesize($_FILES['product_image']['tmp_name']);
+        if ($check !== false) {
+            if (move_uploaded_file($_FILES['product_image']['tmp_name'], $target_file)) {
+                $image_url = $relative_path . $safe_filename; // Save relative path to DB
+            } else {
+                $message = "Sorry, there was an error uploading your file.";
+                $messageType = "danger";
+            }
+        } else {
+            $message = "File is not an image.";
+            $messageType = "danger";
+        }
+    }
+    
+    // Insert into database if no errors
+    if (empty($message)) {
+        // Insert into products table without image_url
+        $stmt = $conn->prepare("INSERT INTO products (product_name, category_id, description, price, seller_id) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sisdi", $product_name, $category_id, $product_description, $product_price, $seller_id);
+
+        if ($stmt->execute()) {
+            $product_id = $conn->insert_id; // Get inserted product ID
+
+            // ✅ Now insert into product_images table
+            if (!empty($image_url)) {
+                $imgStmt = $conn->prepare("INSERT INTO product_images (product_id, image_url) VALUES (?, ?)");
+                $imgStmt->bind_param("is", $product_id, $image_url);
+                $imgStmt->execute();
+                $imgStmt->close();
+            }
+
+            $message = "Product has been added successfully!";
+            $messageType = "success";
+        } else {
+            $message = "Error: " . $stmt->error;
+            $messageType = "danger";
+        }
+
+        $stmt->close();
+    }
+}
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,39 +193,12 @@
             border-color: #667eea;
             background: rgba(102, 126, 234, 0.05);
         }
-        .image-upload-area.dragover {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
         .image-preview {
             max-width: 200px;
             max-height: 200px;
             border-radius: 10px;
-            margin: 10px;
+            margin: 10px 0;
             border: 2px solid #dee2e6;
-        }
-        .image-container {
-            position: relative;
-            display: inline-block;
-        }
-        .remove-image {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .price-input-group {
-            position: relative;
         }
         .price-input-group .input-group-text {
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -189,7 +259,15 @@
 
         <!-- Content -->
         <div class="content-wrapper">
-            <form id="addProductForm" action="add_product.php" method="POST" enctype="multipart/form-data">
+            <?php if (!empty($message)): ?>
+                <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
+                    <i class="fas fa-<?php echo $messageType == 'success' ? 'check-circle' : 'exclamation-circle'; ?> me-2"></i>
+                    <?php echo $message; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <?php endif; ?>
+
+            <form id="addProductForm" method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-lg-8">
                         <!-- Basic Information -->
@@ -210,13 +288,11 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="productCategory" class="form-label fw-bold">Category *</label>
-                                    <select class="form-select" id="productCategory" name="product_category" required>
+                                    <select class="form-select" id="productCategory" name="category_id" required>
                                         <option value="">Select Category</option>
-                                        <option value="electronics">Club Shirts</option>
-                                        <option value="clothing">National Team Shirts</option>
-                                        <option value="books">Footballs</option>
-                                        <option value="home">Gear</option>
-                                        <option value="sports">Football Boots</option>
+                                        <?php foreach($categories as $category): ?>
+                                            <option value="<?php echo $category['category_id']; ?>"><?php echo $category['category_name']; ?></option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
@@ -238,14 +314,14 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="productPrice" class="form-label fw-bold">Price *</label>
-                                    <div class="input-group price-input-group">
+                                    <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="number" class="form-control" id="productPrice" name="product_price" placeholder="0.00" step="0.01" min="0" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="productSalePrice" class="form-label fw-bold">Sale Price</label>
-                                    <div class="input-group price-input-group">
+                                    <div class="input-group">
                                         <span class="input-group-text">$</span>
                                         <input type="number" class="form-control" id="productSalePrice" name="product_sale_price" placeholder="0.00" step="0.01" min="0">
                                     </div>
@@ -257,19 +333,16 @@
                             </div>
                         </div>
 
-                        <!-- Product Images -->
+                        <!-- Product Image -->
                         <div class="form-section">
                             <h5 class="section-title">
-                                <i class="fas fa-images me-2"></i>Product Images
+                                <i class="fas fa-image me-2"></i>Product Image
                             </h5>
-                            <div class="image-upload-area" id="imageUploadArea">
+                            <div class="image-upload-area" onclick="document.getElementById('productImage').click()">
                                 <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">Drag & Drop Images Here</h5>
-                                <p class="text-muted mb-3">or click to browse</p>
-                                <input type="file" id="productImages" name="product_images[]" multiple accept="image/*" class="d-none">
-                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('productImages').click()">
-                                    <i class="fas fa-plus me-2"></i>Add Images
-                                </button>
+                                <h5 class="text-muted">Click to Upload Image</h5>
+                                <p class="text-muted mb-3">JPG, PNG, GIF up to 5MB</p>
+                                <input type="file" id="productImage" name="product_image" accept="image/*" class="d-none" onchange="previewImage(this)">
                             </div>
                             <div id="imagePreview" class="mt-3"></div>
                         </div>
@@ -285,58 +358,10 @@
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-2"></i>Save Product
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary" onclick="saveDraft()">
-                                    <i class="fas fa-file-alt me-2"></i>Save as Draft
-                                </button>
                                 <button type="button" class="btn btn-outline-danger" onclick="resetForm()">
                                     <i class="fas fa-undo me-2"></i>Reset Form
                                 </button>
                             </div>
-                        </div>
-
-                        <!-- SEO & Meta -->
-                        <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-search me-2"></i>SEO & Meta
-                            </h5>
-                            <div class="mb-3">
-                                <label for="metaTitle" class="form-label fw-bold">Meta Title</label>
-                                <input type="text" class="form-control" id="metaTitle" name="meta_title" placeholder="SEO title">
-                            </div>
-                            <div class="mb-3">
-                                <label for="metaDescription" class="form-label fw-bold">Meta Description</label>
-                                <textarea class="form-control" id="metaDescription" name="meta_description" rows="3" placeholder="SEO description"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="productTags" class="form-label fw-bold">Tags</label>
-                                <input type="text" class="form-control" id="productTags" name="product_tags" placeholder="Tag1, Tag2, Tag3">
-                                <small class="text-muted">Separate tags with commas</small>
-                            </div>
-                        </div>
-
-                        <!-- Product Specifications -->
-                        <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-list-ul me-2"></i>Specifications
-                            </h5>
-                            <div id="specifications">
-                                <div class="row mb-2">
-                                    <div class="col-5">
-                                        <input type="text" class="form-control form-control-sm" name="spec_name[]" placeholder="Specification">
-                                    </div>
-                                    <div class="col-5">
-                                        <input type="text" class="form-control form-control-sm" name="spec_value[]" placeholder="Value">
-                                    </div>
-                                    <div class="col-2">
-                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSpec(this)">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addSpec()">
-                                <i class="fas fa-plus me-1"></i>Add Specification
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -346,111 +371,30 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Image upload functionality
-        const imageUploadArea = document.getElementById('imageUploadArea');
-        const imageInput = document.getElementById('productImages');
-        const imagePreview = document.getElementById('imagePreview');
-        let uploadedImages = [];
-
-        // Drag and drop functionality
-        imageUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.add('dragover');
-        });
-
-        imageUploadArea.addEventListener('dragleave', () => {
-            imageUploadArea.classList.remove('dragover');
-        });
-
-        imageUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        });
-
-        imageUploadArea.addEventListener('click', () => {
-            imageInput.click();
-        });
-
-        imageInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        function handleFiles(files) {
-            for (let file of files) {
-                if (file.type.startsWith('image/')) {
-                    uploadedImages.push(file);
-                    displayImage(file);
-                }
+        // Image preview functionality
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Product Image Preview">`;
+                };
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function displayImage(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const imageContainer = document.createElement('div');
-                imageContainer.className = 'image-container';
-                imageContainer.innerHTML = `
-                    <img src="${e.target.result}" class="image-preview" alt="Product Image">
-                    <button type="button" class="remove-image" onclick="removeImage(this, '${file.name}')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
-                imagePreview.appendChild(imageContainer);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function removeImage(button, fileName) {
-            uploadedImages = uploadedImages.filter(file => file.name !== fileName);
-            button.parentElement.remove();
-        }
-
-        // Specifications functionality
-        function addSpec() {
-            const specsContainer = document.getElementById('specifications');
-            const newSpec = document.createElement('div');
-            newSpec.className = 'row mb-2';
-            newSpec.innerHTML = `
-                <div class="col-5">
-                    <input type="text" class="form-control form-control-sm" name="spec_name[]" placeholder="Specification">
-                </div>
-                <div class="col-5">
-                    <input type="text" class="form-control form-control-sm" name="spec_value[]" placeholder="Value">
-                </div>
-                <div class="col-2">
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSpec(this)">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            specsContainer.appendChild(newSpec);
-        }
-
-        function removeSpec(button) {
-            button.closest('.row').remove();
-        }
-
-        // Form actions
-        function saveDraft() {
-            document.getElementById('productStatus').value = 'draft';
-            document.getElementById('addProductForm').submit();
-        }
-
+        // Reset form
         function resetForm() {
             if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
                 document.getElementById('addProductForm').reset();
-                imagePreview.innerHTML = '';
-                uploadedImages = [];
+                document.getElementById('imagePreview').innerHTML = '';
             }
         }
 
         // Form validation
         document.getElementById('addProductForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Basic validation
             const requiredFields = ['productName', 'productCategory', 'productPrice', 'productStock'];
             let isValid = true;
             
@@ -464,19 +408,9 @@
                 }
             });
             
-            if (isValid) {
-                // Show success message
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                alertDiv.innerHTML = `
-                    <i class="fas fa-check-circle me-2"></i>
-                    Product has been added successfully!
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                `;
-                document.querySelector('.content-wrapper').insertBefore(alertDiv, document.querySelector('.row'));
-                
-                // Here you would normally submit the form
-                // this.submit();
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
             }
         });
     </script>

@@ -89,8 +89,8 @@
     </section>
 
     <!--Featured-->
-    <section id="featured" class="my-5 pb-5">
-      <div class="container text-center mt-5 py-5">
+    <section id="featured" class="my-3 pb-3">
+      <div class="container text-center mt-4 py-4">
         <h3>Featured Products</h3>
         <hr class="mx-auto">
         <p>Here you can check out our fetured products</p>
@@ -125,7 +125,7 @@
     </section>
 
     <!--Banner-->
-    <section id="banner" class="my-5 py5">
+    <section id="banner" class="my-1">
       <div class="container">
         <h4>CLEARANCE SALE</h4>
         <h1>2024/25 SEASON <br> Up to 50% Off</h1>
@@ -135,8 +135,8 @@
     </section>
 
     <!--Boot Locker-->
-    <section id="Boot Locker" class="my-5">
-      <div class="container text-center mt-5 py-5">
+    <section id="Boot Locker" class="my-4 pb-3">
+      <div class="container text-center">
         <h3>Boot Locker</h3>
         <hr class="mx-auto">
         <p>Here you can check out more of our boots</p>
@@ -168,8 +168,8 @@
     </section>
 
     <!--Shirt Locker-->
-    <section id="Shirt Locker" class="my-5">
-      <div class="container text-center mt-5 py-5">
+    <section id="Shirt Locker" class="my-5 pb-3">
+      <div class="container text-center mt-4 py-4">
         <h3>Shirt Locker</h3>
         <hr class="mx-auto">
         <p>Here you can check out more of our shirts</p>

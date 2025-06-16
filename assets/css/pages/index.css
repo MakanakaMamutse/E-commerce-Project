@@ -122,9 +122,18 @@
     text-align: start;
 }
 
- .product img{
-        width: 100%; 
-        height: 350px; /* Fixed height for images */
-        object-fit: contain; /* Ensures entire image is visible */
-        object-position: center; /* Centers the image */
-      }
+.product img{
+    width: 100%; 
+    height: 350px; /* Fixed height for images */
+    object-fit: contain; /* Ensures entire image is visible */
+    object-position: center; /* Centers the image */
+}
+
+.product:hover img {
+    transform: scale(1.06);       /* Zoom in slightly */
+    transition: transform 0.5s ease; /* Smooth transition */
+    opacity: 0.8;                 /* Fade a bit to show hover */
+}
+
+
+

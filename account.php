@@ -258,8 +258,7 @@ if (isset($_SESSION['login_status'])) {
                       <a class="edit-btn" href="#">Edit</a>
                     </td>
                     <td>
-                      <span>$</span>
-                      <span class="product-price"><?php echo $row['total_amount']; ?></span>
+                      <span class="product-price">$<?php echo $row['total_amount']; ?></span>
                     </td>
                 </tr>
 

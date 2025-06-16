@@ -75,7 +75,7 @@ session_start();
                         $_SESSION['login_status'] = true;
                         
                         // Redirect to admin dashboard
-                        header("Location: admin_dashboard.php"); // or wherever your admin area is
+                        header("Location: admin_dashboard.php"); // Where admin area is
                         exit();
                     
                         } else {
