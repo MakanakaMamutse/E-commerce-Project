@@ -130,6 +130,11 @@
                     $errors['general'] = "Failed to retrieve orders. Please try again.";
                 }   
         }
+        else {
+            // Redirect to login page after since the role type isnt set.
+            //header("Location: login.php");
+          //  exit();
+        }
 
 ?>
 

@@ -9,16 +9,20 @@ session_start();
         exit();
     }
 
+    // Handle user logout functionality
+    if (isset($_GET['logout'])) {
+        if (isset($_SESSION['login_status'])) {
+            unset($_SESSION['login_status']);
+            unset($_SESSION['username']);
+            unset($_SESSION['email']);
+            unset($_SESSION['user_id']);
+            unset($_SESSION['role_type']);
 
-
-
-
-
-
-
-
-
-
+            // Redirect to login page after logout
+            header("Location: login.php");
+            exit();
+        }
+    }
 
 
 
@@ -112,7 +116,7 @@ session_start();
             <h2 class="page-title mb-0">Account Settings</h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="admin_dashboard.html" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="admin_dashboard.php" class="text-decoration-none">Dashboard</a></li>
                     <li class="breadcrumb-item active">Account</li>
                 </ol>
             </nav>
@@ -126,7 +130,7 @@ session_start();
                     <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
                     <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="login.html"><i class="fas fa-sign-out-alt me-2"></i>Sign out</a></li>
+                    <li><a class="dropdown-item" href="account.php?logout=1"><i class="fas fa-sign-out-alt me-2"></i>Sign out</a></li>
                 </ul>
             </div>
         </div>

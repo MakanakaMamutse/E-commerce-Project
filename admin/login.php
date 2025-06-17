@@ -7,7 +7,10 @@ session_start();
   //If the Admin is already logged in, redirect them to the admin dashboard
   // This prevents unauthorized access to the login page, else seller must re-login
   if (isset($_SESSION['login_status']) && $_SESSION['login_status'] === true && $_SESSION['user_id'] == 1) {
-      // User is already logged in, redirect to admin page
+      // User is already logged in, redirect to admin page 
+      // Add sql logic for when admin is logged int else accoutn page breaks
+      //////////////
+      $_SESSION['role_type'] = 'admin';
       header("Location: admin_dashboard.php");
       exit();
   }
@@ -104,8 +107,6 @@ session_start();
       $conn->close();
   }
 ?>
-
-
 
 
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Account Management Page
- * Handles user authentication, logout, and password changes
+ * Handles user authentication, logout, password changes, and seller upgrades
  */
 
 // Start the session
@@ -33,6 +33,59 @@ if (isset($_GET['logout'])) {
         // Redirect to login page after logout
         header("Location: login.php");
         exit();
+    }
+}
+
+// Get user's current role
+$user_role = 'customer'; // Default role
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+    $roleQuery = "SELECT ur.role_type FROM user_roles ur JOIN users u ON ur.user_id = u.user_id WHERE u.user_id = ?";
+    $stmt = $conn->prepare($roleQuery);
+    
+    if ($stmt) {
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($row = $result->fetch_assoc()) {
+            $user_role = $row['role_type'];
+        }
+        $stmt->close();
+    }
+}
+
+/**
+ * Handle Seller Upgrade Request
+ */
+if (isset($_POST['upgrade-to-seller'])) {
+    $user_id = $_SESSION['user_id'];
+    
+    // Check if user is already a seller or admin
+    if ($user_role === 'seller' || $user_role === 'admin') {
+        $errors['upgrade'] = "You are already registered as a " . ucfirst($user_role) . ".";
+    } else {
+        // Update user role to seller
+        $upgradeQuery = "UPDATE user_roles SET role_type = 'seller' WHERE user_id = ?";
+        $stmt = $conn->prepare($upgradeQuery);
+        
+        if ($stmt) {
+            $stmt->bind_param("i", $user_id);
+            
+            if ($stmt->execute()) {
+                if ($stmt->affected_rows > 0) {
+                    $success_message = "Congratulations! Your account has been upgraded to Seller status.";
+                    $user_role = 'seller'; // Update the current role variable
+                } else {
+                    $errors['upgrade'] = "Failed to upgrade account. Please try again.";
+                }
+            } else {
+                $errors['upgrade'] = "Database error occurred during upgrade. Please try again.";
+            }
+            $stmt->close();
+        } else {
+            $errors['upgrade'] = "Failed to prepare upgrade query. Please try again.";
+        }
     }
 }
 
@@ -141,15 +194,70 @@ if (isset($_SESSION['login_status'])) {
     <!--Account Page-->
   <section class="my-5 py-5">
       <div class="row container mx-auto">
-          <div class="text-center mt-3 pt-5 col-lg-6 col-md-12 col-sm-12">
-              <h3>Account Info</h3>
-              <hr class="mx-auto">
-              <div class="account-info">
-                  <p>Name: <span> <?php echo htmlspecialchars($_SESSION['username']); ?> </span></p>
-                  <p>Email: <span> <?php echo htmlspecialchars($_SESSION['email']); ?> </span></p>
-                  <p><a href="#orders" id="order-btn">Your Orders</a></p>
-                  <p><a href="account.php?logout=1" id="logout-btn">Logout</a></p>
+          <div class="col-lg-6 col-md-12 col-sm-12">
+              <!-- Account Info Section -->
+              <div class="text-center mt-3 pt-5">
+                  <h3>Account Info</h3>
+                  <hr class="mx-auto">
+                  <div class="account-info">
+                      <p>Name: <span> <?php echo htmlspecialchars($_SESSION['username']); ?> </span></p>
+                      <p>Email: <span> <?php echo htmlspecialchars($_SESSION['email']); ?> </span></p>
+                      <p>Role: <span class="badge bg-<?php echo ($user_role === 'admin') ? 'danger' : (($user_role === 'seller') ? 'warning' : 'secondary'); ?>">
+                          <?php echo ucfirst($user_role); ?>
+                      </span></p>
+                      
+                      <?php if ($user_role === 'seller' || $user_role === 'admin'): ?>
+                          <p><a href="admin/login.php" class="btn btn-sm btn-outline-primary" target="_blank">
+                              <i class="fas fa-cog"></i> Admin Panel
+                          </a></p>
+                      <?php endif; ?>
+                      
+                      <p><a href="#orders" id="order-btn">Your Orders</a></p>
+                      <p><a href="account.php?logout=1" id="logout-btn">Logout</a></p>
+                  </div>
               </div>
+              
+              <!-- Seller Upgrade Section (in the white space) -->
+              <?php if ($user_role === 'customer'): ?>
+              <div class="mt-4">
+                  <div class="card">
+                      <div class="card-header bg-warning text-dark">
+                          <h5 class="mb-0"><i class="fas fa-store"></i> Become a Seller</h5>
+                      </div>
+                      <div class="card-body">
+                          <p class="card-text">
+                              Want to start selling on our platform? Upgrade your account to seller status and start managing your own products!
+                          </p>
+                          
+                          <!-- Upgrade Error Message Display -->
+                          <?php if (isset($errors['upgrade'])): ?>
+                              <div class="alert alert-danger" role="alert">
+                                  <strong>Error:</strong> <?php echo htmlspecialchars($errors['upgrade']); ?>
+                              </div>
+                          <?php endif; ?>
+                          
+                          <form method="POST" action="account.php" class="d-inline">
+                              <button type="submit" 
+                                      name="upgrade-to-seller" 
+                                      class="btn btn-warning"
+                                      onclick="return confirm('Are you sure you want to upgrade to a seller account? This action cannot be undone.')">
+                                  <i class="fas fa-arrow-up"></i> Upgrade to Seller
+                              </button>
+                          </form>
+                          
+                          <div class="mt-2">
+                              <small class="text-muted">
+                                  <strong>Benefits of being a seller:</strong><br>
+                                  • Add and manage your own products<br>
+                                  • Access to seller dashboard<br>
+                                  • Track your sales and inventory<br>
+                                  • Connect with customers directly
+                              </small>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <?php endif; ?>
           </div>
 
           <div class="col-lg-6 col-md-12 col-sm-12">
@@ -167,7 +275,8 @@ if (isset($_SESSION['login_status'])) {
                   </div>
               <?php endif; ?>
               
-              <form id="account-form" method="POST" action="account.php">
+              <!-- Password Change Form -->
+              <form id="account-form" method="POST" action="account.php" class="mt-3 pt-5">
                   <h3>Change Password</h3>
                   <hr class="mx-auto">
                   
