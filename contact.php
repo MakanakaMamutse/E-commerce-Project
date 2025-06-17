@@ -447,26 +447,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <h4>M&M Sports</h4>
-                    <p class="mb-3">Your trusted partner for quality sports equipment and gear.</p>
-                    <div class="social-links">
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                    <hr class="my-4">
-                    <p>&copy; 2024 M&M Sports. All rights reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
     <script>
@@ -538,5 +518,5 @@
             observer.observe(el);
         });
     </script>
-</body>
-</html>
+
+<?php include('layouts/footer.html'); ?>

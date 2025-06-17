@@ -7,6 +7,10 @@
 @import url('global.css');
 @import url('components.css');
 
+/* Layout Component Styles */
+@import url('layouts/footer.css');
+
+
 /* Page-Specific Styles */
 @import url('pages/account.css');
 @import url('pages/cart.css');

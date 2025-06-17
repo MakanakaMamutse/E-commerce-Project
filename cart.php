@@ -251,7 +251,7 @@ if(isset($_POST['reset_session'])) {
 
      </section>
 
-<?php include('layouts/footer.php'); ?>
+<?php include('layouts/footer.html'); ?>
 
   <!-- <form method="POST" action="cart.php">
     <input type="submit" name="reset_session" value="Reset Cart" class="btn btn-warning">

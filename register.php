@@ -257,4 +257,4 @@ if (isset($_POST['register'])) {
     </section>
 
     
-<?php include('layouts/footer.php'); ?>
+<?php include('layouts/footer.html'); ?>

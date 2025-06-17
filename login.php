@@ -168,5 +168,5 @@ session_start();
       }
     </script>
 
-<?php include('layouts/footer.php'); ?>
+<?php include('layouts/footer.html'); ?>
   

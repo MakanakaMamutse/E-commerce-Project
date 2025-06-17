@@ -1,5 +1,10 @@
 /* Shopping Cart Styles */
 
+.cart {
+    
+   min-height: 60vh;
+}
+
 /* Cart Table */
 .cart table {
     width: 100%;
