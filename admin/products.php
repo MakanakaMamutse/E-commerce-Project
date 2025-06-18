@@ -462,11 +462,66 @@ if (isset($_GET['logout'])) {
         }
 
         // Delete product function
-        function deleteProduct(ProductID) {
-            if (confirm(`Are you sure you want to delete product ${ProductID}?`)) {
-                // In a real application, this would make an API call to delete the product
-                console.log('Deleting product with ID:', ProductID);
-                alert(`Product ${sku} deleted! (This would remove the product in a real application)`);
+        function deleteProduct(productID) {
+            // Show confirmation dialog before proceeding
+            if (confirm(`Are you sure you want to delete product ID ${productID}? This action cannot be undone.`)) {
+                
+                // Get the delete button and show loading state
+                const deleteButton = document.querySelector(`button[onclick="deleteProduct(${productID})"]`);
+                const originalHTML = deleteButton.innerHTML;
+                deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                deleteButton.disabled = true;
+                
+                // Prepare form data to send to server
+                const formData = new FormData();
+                formData.append('product_id', productID);
+                
+                // Send AJAX request to delete_product.php
+                fetch('delete_product.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                // Convert PHP response from JSON string to JavaScript object
+                .then(response => response.json())
+                .then(data => {
+                    // Handle successful or failed deletion based on PHP response
+                    if (data.success) {
+                        // Deletion successful - show message and remove row
+                        alert(data.message);
+                        
+                        // Animate row removal with fade effect
+                        const row = deleteButton.closest('tr');
+                        row.style.transition = 'opacity 0.3s ease';
+                        row.style.opacity = '0';
+                        
+                        // Remove row from DOM after animation completes
+                        setTimeout(() => {
+                            row.remove();
+                            
+                            // Update product count in header badge
+                            const badge = document.querySelector('.badge.bg-primary');
+                            if (badge) {
+                                const currentCount = parseInt(badge.textContent.match(/\d+/)[0]);
+                                badge.textContent = `${currentCount - 1} Products`;
+                            }
+                        }, 300);
+                        
+                    } else {
+                        // Deletion failed - show error and restore button
+                        alert('Error: ' + data.message);
+                        deleteButton.innerHTML = originalHTML;
+                        deleteButton.disabled = false;
+                    }
+                })
+                // Handle network errors or other issues with the request
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the product. Please try again.');
+                    
+                    // Restore button to original state
+                    deleteButton.innerHTML = originalHTML;
+                    deleteButton.disabled = false;
+                });
             }
         }
 
@@ -495,21 +550,9 @@ if (isset($_GET['logout'])) {
                 }
             }
         });
-
-            // Get current page filename
-            const currentPage = window.location.pathname.split('/').pop();
-
-            // Remove active class from all nav links
-            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-
-            // Add active class to current page link
-            const currentLink = document.querySelector(`.sidebar a[href="${currentPage}"]`);
-            if (currentLink) {
-                currentLink.classList.add('active');
-            }
-
     </script>
+
+    <script src="js/active_sidebar.js"></script>
+
 </body>
 </html>

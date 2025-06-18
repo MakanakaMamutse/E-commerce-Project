@@ -513,5 +513,8 @@ session_start();
             });
         });
     </script>
+    
+    <script src="js/active_sidebar.js"></script>
+
 </body>
 </html>

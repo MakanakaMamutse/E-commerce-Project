@@ -310,5 +310,8 @@
         // Initialize with proper height
         textarea.style.height = textarea.scrollHeight + 'px';
     </script>
+
+    <script src="js/active_sidebar.js"></script>
+
 </body>
 </html>

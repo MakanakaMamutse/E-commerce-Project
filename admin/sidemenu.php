@@ -5,7 +5,7 @@
         </div>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link active" href="admin_dashboard.php">
+                <a class="nav-link" href="admin_dashboard.php">
                     <i class="fas fa-tachometer-alt me-3"></i>Dashboard
                 </a>
             </li>
