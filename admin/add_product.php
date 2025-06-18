@@ -1,60 +1,65 @@
 <?php
 
 session_start();
-// Check if user is logged in
-// Database connection
+// Checking if user is logged in and has proper permissions
+// Establishing database connection to handle product data
 include('../server/connection.php');
 
+// Initializing message variables for user feedback
 $message = "";
 $messageType = "";
 
-// Get categories for dropdown
+// Fetching all available categories from database for dropdown menu
 $categories = [];
 $result = $conn->query("SELECT category_id, category_name FROM categories ORDER BY category_id");
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        $categories[] = $row;
+        $categories[] = $row; // Building categories array for later use
     }
 }
 
-// Handle form submission
+// Processing form submission when user clicks submit button
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    // Capturing form data that was submitted by the user
     $product_name = $_POST['product_name'];
     $category_id = $_POST['category_id'];
     $product_description = $_POST['product_description'];
     $product_price = $_POST['product_price'];
-    $seller_id = $_SESSION['user_id']; 
+    $seller_id = $_SESSION['user_id']; // Getting current user's ID from session
 
-    // Get category name for folder structure
+    // Finding the category name to create organized folder structure
     $category_name = "";
     foreach($categories as $cat) {
         if($cat['category_id'] == $category_id) {
             $category_name = $cat['category_name'];
-            break;
+            break; // Found the matching category, stopping the search
         }
     }
     
-    // Handle image upload
+    // Handling image upload process if user provided an image
     $image_url = "";
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] == 0) {
-        $relative_path = "images/" . strtolower(str_replace(' ', '-', $category_name)) . "/"; // This is what's saved to DB
-        $target_dir = "../assets/" . $relative_path; // Full upload path on disk
+        // Creating organized folder structure based on category
+        $relative_path = "images/" . strtolower(str_replace(' ', '-', $category_name)) . "/"; // Path saved to database
+        $target_dir = "../assets/" . $relative_path; // Actual upload directory on server
         
-        // Create directory if it doesn't exist
+        // Creating directory if it doesn't exist yet
         if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true); //Sets full permissions (read/write/execute for all)
+            mkdir($target_dir, 0777, true); // Setting full permissions for web server access
         }
         
+        // Generating safe filename to prevent conflicts and security issues
         $file_extension = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
         $safe_filename = strtolower(str_replace(' ', '-', $product_name)) . '.' . $file_extension;
         $target_file = $target_dir . $safe_filename;
         
-        // Check if image file is actual image
+        // Validating that uploaded file is actually an image
         $check = getimagesize($_FILES['product_image']['tmp_name']);
         if ($check !== false) {
+            // Moving uploaded file from temporary location to permanent storage
             if (move_uploaded_file($_FILES['product_image']['tmp_name'], $target_file)) {
-                $image_url = $relative_path . $safe_filename; // Save relative path to DB
+                $image_url = $relative_path . $safe_filename; // Storing relative path for database
             } else {
                 $message = "Sorry, there was an error uploading your file.";
                 $messageType = "danger";
@@ -65,16 +70,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     
-    // Insert into database if no errors
+    // Saving product data to database if no upload errors occurred
     if (empty($message)) {
-        // Insert into products table without image_url
+        // Inserting basic product information into products table
         $stmt = $conn->prepare("INSERT INTO products (product_name, category_id, description, price, seller_id) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sisdi", $product_name, $category_id, $product_description, $product_price, $seller_id);
 
         if ($stmt->execute()) {
-            $product_id = $conn->insert_id; // Get inserted product ID
+            $product_id = $conn->insert_id; // Getting the ID of newly created product
 
-            // Now insert into product_images table
+            // Saving image information to separate table if image was uploaded
             if (!empty($image_url)) {
                 $imgStmt = $conn->prepare("INSERT INTO product_images (product_id, image_url) VALUES (?, ?)");
                 $imgStmt->bind_param("is", $product_id, $image_url);
@@ -101,9 +106,12 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Product - Admin</title>
+    <!-- Bootstrap CSS for responsive design and components -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons throughout the interface -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* Admin sidebar styling with gradient background */
         .sidebar {
             background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
             min-height: 100vh;
@@ -113,6 +121,7 @@ $conn->close();
             width: 250px;
             z-index: 1000;
         }
+        /* Sidebar navigation links with hover effects */
         .sidebar .nav-link {
             color: #bdc3c7;
             padding: 15px 25px;
@@ -126,10 +135,12 @@ $conn->close();
             color: #3498db;
             border-left-color: #3498db;
         }
+        /* Main content area positioned to accommodate sidebar */
         .main-content {
             margin-left: 250px;
             padding: 0;
         }
+        /* Top navigation bar with shadow */
         .top-navbar {
             background: #fff;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -139,6 +150,7 @@ $conn->close();
         .content-wrapper {
             padding: 0 2rem 2rem;
         }
+        /* Card styling with modern shadow effects */
         .card {
             border: none;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
@@ -153,6 +165,7 @@ $conn->close();
             background: none;
             padding: 0;
         }
+        /* Form input styling with focus effects */
         .form-control, .form-select {
             border-radius: 10px;
             padding: 12px 15px;
@@ -163,6 +176,7 @@ $conn->close();
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
+        /* Primary button with gradient and hover animation */
         .btn-primary {
             background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
@@ -180,6 +194,7 @@ $conn->close();
             padding: 12px 30px;
             font-weight: 600;
         }
+        /* File upload area with drag-and-drop styling */
         .image-upload-area {
             border: 3px dashed #dee2e6;
             border-radius: 15px;
@@ -193,6 +208,7 @@ $conn->close();
             border-color: #667eea;
             background: rgba(102, 126, 234, 0.05);
         }
+        /* Image preview styling */
         .image-preview {
             max-width: 200px;
             max-height: 200px;
@@ -200,6 +216,7 @@ $conn->close();
             margin: 10px 0;
             border: 2px solid #dee2e6;
         }
+        /* Price input with currency symbol */
         .price-input-group .input-group-text {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
@@ -207,6 +224,7 @@ $conn->close();
             border-radius: 10px 0 0 10px;
             font-weight: 600;
         }
+        /* Form sections with consistent spacing */
         .form-section {
             background: white;
             border-radius: 15px;
@@ -225,15 +243,16 @@ $conn->close();
 </head>
 <body class="bg-light">
   
-    <!-- Sidebar -->
+    <!-- Admin navigation sidebar -->
     <?php include('sidemenu.php'); ?>
 
-    <!-- Main Content -->
+    <!-- Main Content Area -->
     <div class="main-content">
-        <!-- Top Navbar -->
+        <!-- Top Navigation Bar -->
         <div class="top-navbar d-flex justify-content-between align-items-center">
             <div>
                 <h2 class="page-title mb-0">Add New Product</h2>
+                <!-- Breadcrumb navigation -->
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="admin_dashboard.php" class="text-decoration-none">Dashboard</a></li>
@@ -242,6 +261,7 @@ $conn->close();
                     </ol>
                 </nav>
             </div>
+            <!-- User dropdown menu -->
             <div class="d-flex align-items-center">
                 <div class="dropdown">
                     <button class="btn btn-link text-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -257,8 +277,9 @@ $conn->close();
             </div>
         </div>
 
-        <!-- Content -->
+        <!-- Main Content Wrapper -->
         <div class="content-wrapper">
+            <!-- Success/Error Message Display -->
             <?php if (!empty($message)): ?>
                 <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
                     <i class="fas fa-<?php echo $messageType == 'success' ? 'check-circle' : 'exclamation-circle'; ?> me-2"></i>
@@ -267,10 +288,11 @@ $conn->close();
                 </div>
             <?php endif; ?>
 
+            <!-- Product Add Form with file upload capability -->
             <form id="addProductForm" method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-lg-8">
-                        <!-- Basic Information -->
+                        <!-- Basic Product Information Section -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-info-circle me-2"></i>Basic Information
@@ -288,6 +310,7 @@ $conn->close();
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="productCategory" class="form-label fw-bold">Category *</label>
+                                    <!-- Dynamic category dropdown populated from database -->
                                     <select class="form-select" id="productCategory" name="category_id" required>
                                         <option value="">Select Category</option>
                                         <?php foreach($categories as $category): ?>
@@ -306,7 +329,7 @@ $conn->close();
                             </div>
                         </div>
 
-                        <!-- Pricing & Inventory -->
+                        <!-- Pricing and Inventory Management Section -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-dollar-sign me-2"></i>Pricing & Inventory
@@ -333,23 +356,25 @@ $conn->close();
                             </div>
                         </div>
 
-                        <!-- Product Image -->
+                        <!-- Product Image Upload Section -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-image me-2"></i>Product Image
                             </h5>
+                            <!-- Click-to-upload image area -->
                             <div class="image-upload-area" onclick="document.getElementById('productImage').click()">
                                 <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
                                 <h5 class="text-muted">Click to Upload Image</h5>
                                 <p class="text-muted mb-3">JPG, PNG, GIF up to 5MB</p>
                                 <input type="file" id="productImage" name="product_image" accept="image/*" class="d-none" onchange="previewImage(this)">
                             </div>
+                            <!-- Image preview container -->
                             <div id="imagePreview" class="mt-3"></div>
                         </div>
                     </div>
 
+                    <!-- Sidebar with Action Buttons -->
                     <div class="col-lg-4">
-                        <!-- Quick Actions -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-cogs me-2"></i>Actions
@@ -369,52 +394,58 @@ $conn->close();
         </div>
     </div>
 
+    <!-- Bootstrap JavaScript for interactive components -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Image preview functionality
+        // Image preview functionality - showing uploaded image before form submission
         function previewImage(input) {
             const preview = document.getElementById('imagePreview');
-            preview.innerHTML = '';
+            preview.innerHTML = ''; // Clearing any existing preview
             
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    // Creating and displaying image preview
                     preview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Product Image Preview">`;
                 };
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(input.files[0]); // Converting image to displayable format
             }
         }
 
-        // Reset form
+        // Form reset functionality with confirmation dialog
         function resetForm() {
             if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
                 document.getElementById('addProductForm').reset();
-                document.getElementById('imagePreview').innerHTML = '';
+                document.getElementById('imagePreview').innerHTML = ''; // Clearing image preview
             }
         }
 
-        // Form validation
+        // Client-side form validation before submission
         document.getElementById('addProductForm').addEventListener('submit', function(e) {
             const requiredFields = ['productName', 'productCategory', 'productPrice', 'productStock'];
             let isValid = true;
             
+            // Checking each required field for completion
             requiredFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (!field.value.trim()) {
-                    field.classList.add('is-invalid');
+                    field.classList.add('is-invalid'); // Adding error styling
                     isValid = false;
                 } else {
-                    field.classList.remove('is-invalid');
+                    field.classList.remove('is-invalid'); // Removing error styling
                 }
             });
             
+            // Preventing form submission if validation failed
             if (!isValid) {
                 e.preventDefault();
                 alert('Please fill in all required fields.');
             }
         });
+        
     </script>
 
+    <!-- Script for highlighting active sidebar menu item -->
     <script src="js/active_sidebar.js"></script>
 
 </body>
