@@ -37,9 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
     
-    // Handling image upload process if user provided an image
+    // Handling mandatory image upload - product cannot be created without an image
     $image_url = "";
-    if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] == 0) {
+    // Fixed condition: check if no file uploaded OR if there's an upload error
+    if (!isset($_FILES['product_image']) || $_FILES['product_image']['error'] == UPLOAD_ERR_NO_FILE || $_FILES['product_image']['error'] != UPLOAD_ERR_OK) {
+        $message = "Product image is required. Please upload an image.";
+        $messageType = "danger";
+    } else {
         // Creating organized folder structure based on category
         $relative_path = "images/" . strtolower(str_replace(' ', '-', $category_name)) . "/"; // Path saved to database
         $target_dir = "../assets/" . $relative_path; // Actual upload directory on server
@@ -359,13 +363,13 @@ $conn->close();
                         <!-- Product Image Upload Section -->
                         <div class="form-section">
                             <h5 class="section-title">
-                                <i class="fas fa-image me-2"></i>Product Image
+                                <i class="fas fa-image me-2"></i>Product Image *
                             </h5>
                             <!-- Click-to-upload image area -->
                             <div class="image-upload-area" onclick="document.getElementById('productImage').click()">
                                 <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">Click to Upload Image</h5>
-                                <p class="text-muted mb-3">JPG, PNG, GIF up to 5MB</p>
+                                <h5 class="text-muted">Click to Upload Image *</h5>
+                                <p class="text-muted mb-3">JPG, PNG, GIF up to 5MB (Required)</p>
                                 <input type="file" id="productImage" name="product_image" accept="image/*" class="d-none" onchange="previewImage(this)">
                             </div>
                             <!-- Image preview container -->
@@ -397,51 +401,27 @@ $conn->close();
     <!-- Bootstrap JavaScript for interactive components -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Image preview functionality - showing uploaded image before form submission
-        function previewImage(input) {
-            const preview = document.getElementById('imagePreview');
-            preview.innerHTML = ''; // Clearing any existing preview
-            
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Creating and displaying image preview
-                    preview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Product Image Preview">`;
-                };
-                reader.readAsDataURL(input.files[0]); // Converting image to displayable format
-            }
-        }
+       // Image preview functionality - showing uploaded image before form submission
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = ''; // Clearing any existing preview
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Product Image Preview">`;
+        };
+        reader.readAsDataURL(input.files[0]); // Converting image to displayable format
+    }
+}
 
-        // Form reset functionality with confirmation dialog
-        function resetForm() {
-            if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
-                document.getElementById('addProductForm').reset();
-                document.getElementById('imagePreview').innerHTML = ''; // Clearing image preview
-            }
-        }
-
-        // Client-side form validation before submission
-        document.getElementById('addProductForm').addEventListener('submit', function(e) {
-            const requiredFields = ['productName', 'productCategory', 'productPrice', 'productStock'];
-            let isValid = true;
-            
-            // Checking each required field for completion
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (!field.value.trim()) {
-                    field.classList.add('is-invalid'); // Adding error styling
-                    isValid = false;
-                } else {
-                    field.classList.remove('is-invalid'); // Removing error styling
-                }
-            });
-            
-            // Preventing form submission if validation failed
-            if (!isValid) {
-                e.preventDefault();
-                alert('Please fill in all required fields.');
-            }
-        });
+// Form reset functionality with confirmation dialog
+function resetForm() {
+    if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
+        document.getElementById('addProductForm').reset();
+        document.getElementById('imagePreview').innerHTML = ''; // Clearing image preview
+    }
+}
         
     </script>
 
