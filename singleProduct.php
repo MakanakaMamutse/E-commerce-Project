@@ -143,7 +143,7 @@ else {
 
 
       <!--Related Products-->
-    <section id="related-products" class="my-5 pb-5">
+    <section id="related-products" class="my-5 pb-3">
         <div class="container text-center mt-5 py-5">
           <h3>Related Products</h3>
           <hr class="mx-auto">
@@ -167,7 +167,7 @@ else {
                 <h5 class="p-name"><?php echo $row['product_name']; ?></h5>
                 <h4 class="p-price"><?php echo $row['price']; ?></h4>
                 <p>Simply the best on the market</p>
-                <button class="buy-btn">Buy Now</button>
+                <a href="singleProduct.php?product_id=<?php echo $row['product_id']; ?>" class="buy-btn">Buy Now</a>
               </div>
           <?php } ?>
         </div>
