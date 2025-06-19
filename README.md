@@ -72,17 +72,17 @@ This capstone project was developed as part of my final year Bachelor's degree i
 - **PayPal Integration** - Currently in development
 - **Secure Transactions** - End-to-end payment processing
 - **Multiple Payment Methods** - Credit cards, digital wallets
-
-### Bootstrap Integration & UI/UX
-- **Responsive Grid System** - Leveraged Bootstrap's 12-column grid for consistent layouts
-- **Component Library** - Utilized Bootstrap's pre-built components (modals, cards, forms, navigation)
-- **Mobile-First Approach** - Bootstrap's responsive utilities ensure optimal mobile experience
-- **Custom Theme** - Extended Bootstrap with custom CSS for soccer-specific branding
-- **Interactive Elements** - Bootstrap JavaScript components for enhanced user interactions
 - Real-time chat between buyers and sellers
 - Advanced product recommendation engine
 - Mobile application development
 - Integration with soccer leagues and clubs
+
+### Bootstrap Integration & UI/UX
+- **Responsive Grid System** - Leveraged Bootstrap's 12-column grid for consistent layouts
+- **Component Library** - Utilized Bootstrap's pre-built components (modals, cards, forms, navigation)
+- **Mobile-First Approach** - Bootstrap's responsive utilities ensure an optimal mobile experience
+- **Custom Theme** - Extended Bootstrap with custom CSS for soccer-specific branding
+- **Interactive Elements** - Bootstrap JavaScript components for enhanced user interactions
 
 ## 💡 Technical Considerations
 
