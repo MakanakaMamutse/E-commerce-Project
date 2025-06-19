@@ -1,4 +1,4 @@
-# ⚽ Soccer Hub - C2C E-Commerce Platform
+# ⚽ M&M Sports - C2C E-Commerce Platform
 
 A specialized customer-to-customer e-commerce platform designed exclusively for soccer enthusiasts, facilitating the buying and selling of soccer-related equipment, apparel, and memorabilia.
 
