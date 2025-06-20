@@ -21,84 +21,115 @@ if ($result->num_rows > 0) {
 // Processing form submission when user clicks submit button
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // Capturing form data that was submitted by the user
-    $product_name = $_POST['product_name'];
-    $category_id = $_POST['category_id'];
-    $product_description = $_POST['product_description'];
-    $product_price = $_POST['product_price'];
+    // Capturing and sanitizing form data that was submitted by the user
+    // XSS Protection: Sanitizing all user inputs to prevent script injection
+    $product_name = htmlspecialchars(trim($_POST['product_name']), ENT_QUOTES, 'UTF-8');
+    $category_id = filter_var($_POST['category_id'], FILTER_VALIDATE_INT);
+    $product_description = htmlspecialchars(trim($_POST['product_description']), ENT_QUOTES, 'UTF-8');
+    $product_price = filter_var($_POST['product_price'], FILTER_VALIDATE_FLOAT);
     $seller_id = $_SESSION['user_id']; // Getting current user's ID from session
 
-    // Finding the category name to create organized folder structure
-    $category_name = "";
-    foreach($categories as $cat) {
-        if($cat['category_id'] == $category_id) {
-            $category_name = $cat['category_name'];
-            break; // Found the matching category, stopping the search
-        }
-    }
-    
-    // Handling mandatory image upload - product cannot be created without an image
-    $image_url = "";
-    // Fixed condition: check if no file uploaded OR if there's an upload error
-    if (!isset($_FILES['product_image']) || $_FILES['product_image']['error'] == UPLOAD_ERR_NO_FILE || $_FILES['product_image']['error'] != UPLOAD_ERR_OK) {
-        $message = "Product image is required. Please upload an image.";
+    // XSS Protection: Validate that category_id is a valid integer
+    if ($category_id === false || $category_id <= 0) {
+        $message = "Invalid category selected.";
         $messageType = "danger";
-    } else {
-        // Creating organized folder structure based on category
-        $relative_path = "images/" . strtolower(str_replace(' ', '-', $category_name)) . "/"; // Path saved to database
-        $target_dir = "../assets/" . $relative_path; // Actual upload directory on server
-        
-        // Creating directory if it doesn't exist yet
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true); // Setting full permissions for web server access
+    }
+    // XSS Protection: Validate that price is a valid positive number (must be greater than 0)
+    elseif ($product_price === false || $product_price <= 0) {
+        $message = "Invalid price entered. Price must be greater than 0.";
+        $messageType = "danger";
+    }
+    // XSS Protection: Validate that product name is not empty after sanitization
+    elseif (empty($product_name)) {
+        $message = "Product name is required and cannot contain only special characters.";
+        $messageType = "danger";
+    }
+    else {
+        // Finding the category name to create organized folder structure
+        $category_name = "";
+        foreach($categories as $cat) {
+            if($cat['category_id'] == $category_id) {
+                $category_name = $cat['category_name'];
+                break; // Found the matching category, stopping the search
+            }
         }
         
-        // Generating safe filename to prevent conflicts and security issues
-        $file_extension = pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION);
-        $safe_filename = strtolower(str_replace(' ', '-', $product_name)) . '.' . $file_extension;
-        $target_file = $target_dir . $safe_filename;
-        
-        // Validating that uploaded file is actually an image
-        $check = getimagesize($_FILES['product_image']['tmp_name']);
-        if ($check !== false) {
-            // Moving uploaded file from temporary location to permanent storage
-            if (move_uploaded_file($_FILES['product_image']['tmp_name'], $target_file)) {
-                $image_url = $relative_path . $safe_filename; // Storing relative path for database
-            } else {
-                $message = "Sorry, there was an error uploading your file.";
+        // Handling mandatory image upload - product cannot be created without an image
+        $image_url = "";
+        // Fixed condition: check if no file uploaded OR if there's an upload error
+        if (!isset($_FILES['product_image']) || $_FILES['product_image']['error'] == UPLOAD_ERR_NO_FILE || $_FILES['product_image']['error'] != UPLOAD_ERR_OK) {
+            $message = "Product image is required. Please upload an image.";
+            $messageType = "danger";
+        } else {
+            // Creating organized folder structure based on category
+            $relative_path = "images/" . strtolower(str_replace(' ', '-', $category_name)) . "/"; // Path saved to database
+            $target_dir = "../assets/" . $relative_path; // Actual upload directory on server
+            
+            // Creating directory if it doesn't exist yet
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true); // Setting full permissions for web server access
+            }
+            
+            // Generating safe filename to prevent conflicts and security issues
+            // XSS Protection: Additional sanitization of filename to prevent path traversal
+            $file_extension = strtolower(pathinfo($_FILES['product_image']['name'], PATHINFO_EXTENSION));
+            $safe_filename = preg_replace('/[^a-z0-9\-]/', '', strtolower(str_replace(' ', '-', $product_name))) . '.' . $file_extension;
+            $target_file = $target_dir . $safe_filename;
+            
+            // XSS Protection: Whitelist allowed image extensions
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!in_array($file_extension, $allowed_extensions)) {
+                $message = "Invalid file type. Only JPG, PNG, GIF, and WebP images are allowed.";
                 $messageType = "danger";
             }
-        } else {
-            $message = "File is not an image.";
-            $messageType = "danger";
+            // Validating that uploaded file is actually an image
+            elseif (($check = getimagesize($_FILES['product_image']['tmp_name'])) !== false) {
+                // XSS Protection: Additional validation of file size (5MB limit)
+                if ($_FILES['product_image']['size'] > 5 * 1024 * 1024) {
+                    $message = "File size too large. Maximum size is 5MB.";
+                    $messageType = "danger";
+                } else {
+                    // Moving uploaded file from temporary location to permanent storage
+                    if (move_uploaded_file($_FILES['product_image']['tmp_name'], $target_file)) {
+                        $image_url = $relative_path . $safe_filename; // Storing relative path for database
+                    } else {
+                        $message = "Sorry, there was an error uploading your file.";
+                        $messageType = "danger";
+                    }
+                }
+            } else {
+                $message = "File is not an image.";
+                $messageType = "danger";
+            }
         }
-    }
-    
-    // Saving product data to database if no upload errors occurred
-    if (empty($message)) {
-        // Inserting basic product information into products table
-        $stmt = $conn->prepare("INSERT INTO products (product_name, category_id, description, price, seller_id) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sisdi", $product_name, $category_id, $product_description, $product_price, $seller_id);
+        
+        // Saving product data to database if no upload errors occurred
+        if (empty($message)) {
+            // Inserting basic product information into products table
+            // XSS Protection: Using prepared statements to prevent SQL injection
+            $stmt = $conn->prepare("INSERT INTO products (product_name, category_id, description, price, seller_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("sisdi", $product_name, $category_id, $product_description, $product_price, $seller_id);
 
-        if ($stmt->execute()) {
-            $product_id = $conn->insert_id; // Getting the ID of newly created product
+            if ($stmt->execute()) {
+                $product_id = $conn->insert_id; // Getting the ID of newly created product
 
-            // Saving image information to separate table if image was uploaded
-            if (!empty($image_url)) {
-                $imgStmt = $conn->prepare("INSERT INTO product_images (product_id, image_url) VALUES (?, ?)");
-                $imgStmt->bind_param("is", $product_id, $image_url);
-                $imgStmt->execute();
-                $imgStmt->close();
+                // Saving image information to separate table if image was uploaded
+                if (!empty($image_url)) {
+                    $imgStmt = $conn->prepare("INSERT INTO product_images (product_id, image_url) VALUES (?, ?)");
+                    $imgStmt->bind_param("is", $product_id, $image_url);
+                    $imgStmt->execute();
+                    $imgStmt->close();
+                }
+
+                $message = "Product has been added successfully!";
+                $messageType = "success";
+            } else {
+                $message = "Error: " . $stmt->error;
+                $messageType = "danger";
             }
 
-            $message = "Product has been added successfully!";
-            $messageType = "success";
-        } else {
-            $message = "Error: " . $stmt->error;
-            $messageType = "danger";
+            $stmt->close();
         }
-
-        $stmt->close();
     }
 }
 $conn->close();
@@ -212,6 +243,11 @@ $conn->close();
             border-color: #667eea;
             background: rgba(102, 126, 234, 0.05);
         }
+        /* XSS Protection: Green outline when image is uploaded */
+        .image-upload-area.has-image {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.05);
+        }
         /* Image preview styling */
         .image-preview {
             max-width: 200px;
@@ -285,9 +321,12 @@ $conn->close();
         <div class="content-wrapper">
             <!-- Success/Error Message Display -->
             <?php if (!empty($message)): ?>
-                <div class="alert alert-<?php echo $messageType; ?> alert-dismissible fade show" role="alert">
+                <div class="alert alert-<?php echo htmlspecialchars($messageType, ENT_QUOTES, 'UTF-8'); ?> alert-dismissible fade show" role="alert">
                     <i class="fas fa-<?php echo $messageType == 'success' ? 'check-circle' : 'exclamation-circle'; ?> me-2"></i>
-                    <?php echo $message; ?>
+                    <?php 
+                    // XSS Protection: Escaping message output to prevent script execution
+                    echo htmlspecialchars($message, ENT_QUOTES, 'UTF-8'); 
+                    ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
@@ -304,11 +343,16 @@ $conn->close();
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="productName" class="form-label fw-bold">Product Name *</label>
-                                    <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name" required>
+                                    <!-- XSS Protection: Preserving user input while preventing script execution -->
+                                    <input type="text" class="form-control" id="productName" name="product_name" 
+                                           placeholder="Enter product name" 
+                                           value="<?php echo isset($_POST['product_name']) ? htmlspecialchars($_POST['product_name'], ENT_QUOTES, 'UTF-8') : ''; ?>" 
+                                           required maxlength="255">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="productSku" class="form-label fw-bold">SKU</label>
-                                    <input type="text" class="form-control" id="productSku" name="product_sku" placeholder="Enter SKU">
+                                    <input type="text" class="form-control" id="productSku" name="product_sku" 
+                                           placeholder="Enter SKU" maxlength="100">
                                 </div>
                             </div>
                             <div class="row">
@@ -318,18 +362,29 @@ $conn->close();
                                     <select class="form-select" id="productCategory" name="category_id" required>
                                         <option value="">Select Category</option>
                                         <?php foreach($categories as $category): ?>
-                                            <option value="<?php echo $category['category_id']; ?>"><?php echo $category['category_name']; ?></option>
+                                            <option value="<?php echo htmlspecialchars($category['category_id'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                    <?php echo (isset($_POST['category_id']) && $_POST['category_id'] == $category['category_id']) ? 'selected' : ''; ?>>
+                                                <?php 
+                                                // XSS Protection: Escaping category names in dropdown options
+                                                echo htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8'); 
+                                                ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="productBrand" class="form-label fw-bold">Brand</label>
-                                    <input type="text" class="form-control" id="productBrand" name="product_brand" placeholder="Enter brand name">
+                                    <input type="text" class="form-control" id="productBrand" name="product_brand" 
+                                           placeholder="Enter brand name" maxlength="100">
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="productDescription" class="form-label fw-bold">Description</label>
-                                <textarea class="form-control" id="productDescription" name="product_description" rows="4" placeholder="Enter product description"></textarea>
+                                <!-- XSS Protection: Preserving user input in textarea while preventing script execution -->
+                                <textarea class="form-control" id="productDescription" name="product_description" 
+                                          rows="4" placeholder="Enter product description" maxlength="1000"><?php 
+                                    echo isset($_POST['product_description']) ? htmlspecialchars($_POST['product_description'], ENT_QUOTES, 'UTF-8') : ''; 
+                                ?></textarea>
                             </div>
                         </div>
 
@@ -343,19 +398,25 @@ $conn->close();
                                     <label for="productPrice" class="form-label fw-bold">Price *</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="productPrice" name="product_price" placeholder="0.00" step="0.01" min="0" required>
+                                        <!-- XSS Protection: Preserving numeric input while ensuring proper validation -->
+                                        <input type="number" class="form-control" id="productPrice" name="product_price" 
+                                               placeholder="0.00" step="0.01" min="0.01" max="99999.99"
+                                               value="<?php echo isset($_POST['product_price']) ? htmlspecialchars($_POST['product_price'], ENT_QUOTES, 'UTF-8') : ''; ?>" 
+                                               required>
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="productSalePrice" class="form-label fw-bold">Sale Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="productSalePrice" name="product_sale_price" placeholder="0.00" step="0.01" min="0">
+                                        <input type="number" class="form-control" id="productSalePrice" name="product_sale_price" 
+                                               placeholder="0.00" step="0.01" min="0" max="99999.99">
                                     </div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="productStock" class="form-label fw-bold">Stock Quantity *</label>
-                                    <input type="number" class="form-control" id="productStock" name="product_stock" placeholder="0" min="0" required>
+                                    <input type="number" class="form-control" id="productStock" name="product_stock" 
+                                           placeholder="0" min="0" max="999999" required>
                                 </div>
                             </div>
                         </div>
@@ -369,8 +430,8 @@ $conn->close();
                             <div class="image-upload-area" onclick="document.getElementById('productImage').click()">
                                 <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
                                 <h5 class="text-muted">Click to Upload Image *</h5>
-                                <p class="text-muted mb-3">JPG, PNG, GIF up to 5MB (Required)</p>
-                                <input type="file" id="productImage" name="product_image" accept="image/*" class="d-none" onchange="previewImage(this)">
+                                <p class="text-muted mb-3">JPG, PNG, GIF, WebP up to 5MB (Required)</p>
+                                <input type="file" id="productImage" name="product_image" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" class="d-none" onchange="previewImage(this)">
                             </div>
                             <!-- Image preview container -->
                             <div id="imagePreview" class="mt-3"></div>
@@ -402,16 +463,48 @@ $conn->close();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
        // Image preview functionality - showing uploaded image before form submission
+       // XSS Protection: Client-side validation to ensure only image files are processed
 function previewImage(input) {
     const preview = document.getElementById('imagePreview');
+    const uploadArea = document.querySelector('.image-upload-area');
     preview.innerHTML = ''; // Clearing any existing preview
     
     if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // XSS Protection: Validate file type on client side
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Invalid file type. Please select a JPG, PNG, GIF, or WebP image.');
+            input.value = '';
+            uploadArea.classList.remove('has-image'); // Remove green outline
+            return;
+        }
+        
+        // XSS Protection: Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size too large. Please select an image smaller than 5MB.');
+            input.value = '';
+            uploadArea.classList.remove('has-image'); // Remove green outline
+            return;
+        }
+        
         const reader = new FileReader();
         reader.onload = function(e) {
-            preview.innerHTML = `<img src="${e.target.result}" class="image-preview" alt="Product Image Preview">`;
+            // XSS Protection: Using textContent to prevent any potential script execution
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'image-preview';
+            img.alt = 'Product Image Preview';
+            preview.appendChild(img);
+            
+            // XSS Protection: Add green outline when image is successfully uploaded
+            uploadArea.classList.add('has-image');
         };
-        reader.readAsDataURL(input.files[0]); // Converting image to displayable format
+        reader.readAsDataURL(file); // Converting image to displayable format
+    } else {
+        // Remove green outline if no file selected
+        uploadArea.classList.remove('has-image');
     }
 }
 
@@ -420,8 +513,37 @@ function resetForm() {
     if (confirm('Are you sure you want to reset the form? All data will be lost.')) {
         document.getElementById('addProductForm').reset();
         document.getElementById('imagePreview').innerHTML = ''; // Clearing image preview
+        document.querySelector('.image-upload-area').classList.remove('has-image'); // Remove green outline
     }
 }
+
+// XSS Protection: Additional client-side validation for form inputs
+document.getElementById('addProductForm').addEventListener('submit', function(e) {
+    const productName = document.getElementById('productName').value.trim();
+    const productPrice = document.getElementById('productPrice').value;
+    const productStock = document.getElementById('productStock').value;
+    
+    // Validate product name is not empty
+    if (productName === '') {
+        alert('Product name is required.');
+        e.preventDefault();
+        return;
+    }
+    
+    // Validate price is a positive number
+    if (parseFloat(productPrice) < 0) {
+        alert('Price must be a positive number.');
+        e.preventDefault();
+        return;
+    }
+    
+    // Validate stock is a non-negative integer
+    if (parseInt(productStock) < 0) {
+        alert('Stock quantity must be a non-negative number.');
+        e.preventDefault();
+        return;
+    }
+});
         
     </script>
 

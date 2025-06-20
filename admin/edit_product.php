@@ -103,7 +103,8 @@
                                     <label for="productId" class="form-label">
                                         <i class="fas fa-hashtag me-1"></i>Product ID
                                     </label>
-                                    <div class="product-id-display" id="productId"><?php echo $product['product_id']; ?></div>
+                                    <!-- Display the product ID - this field can't be edited -->
+                                    <div class="product-id-display" id="productId"><?php echo htmlspecialchars($product['product_id'], ENT_QUOTES, 'UTF-8'); ?></div>
                                 </div>
 
                                 <!-- Seller ID (Read-only) -->
@@ -111,7 +112,8 @@
                                     <label for="sellerId" class="form-label">
                                         <i class="fas fa-user me-1"></i>Seller ID
                                     </label>
-                                    <div class="product-id-display" id="sellerId"><?php echo $product['seller_id']; ?></div>
+                                    <!-- Show which seller owns this product -->
+                                    <div class="product-id-display" id="sellerId"><?php echo htmlspecialchars($product['seller_id'], ENT_QUOTES, 'UTF-8'); ?></div>
                                 </div>
                             </div>
 
@@ -123,11 +125,12 @@
                                     </label>
                                     <select class="form-select" id="categoryId" required>
                                         <option value="">Select Category</option>
-                                        <option value="1" <?php echo ($product['category_id'] == 1) ? 'selected' : ''; ?>>Club Shirts</option>
-                                        <option value="2" <?php echo ($product['category_id'] == 2) ? 'selected' : ''; ?>>National Team Shirts</option>
-                                        <option value="3" <?php echo ($product['category_id'] == 3) ? 'selected' : ''; ?>>Footballs</option>
-                                        <option value="4" <?php echo ($product['category_id'] == 4) ? 'selected' : ''; ?>>Gear</option>
-                                        <option value="5" <?php echo ($product['category_id'] == 5) ? 'selected' : ''; ?>>Football Boots</option>
+                                        <!-- Set the current category as selected when loading the form -->
+                                        <option value="1" <?php echo (htmlspecialchars($product['category_id'], ENT_QUOTES, 'UTF-8') == 1) ? 'selected' : ''; ?>>Club Shirts</option>
+                                        <option value="2" <?php echo (htmlspecialchars($product['category_id'], ENT_QUOTES, 'UTF-8') == 2) ? 'selected' : ''; ?>>National Team Shirts</option>
+                                        <option value="3" <?php echo (htmlspecialchars($product['category_id'], ENT_QUOTES, 'UTF-8') == 3) ? 'selected' : ''; ?>>Footballs</option>
+                                        <option value="4" <?php echo (htmlspecialchars($product['category_id'], ENT_QUOTES, 'UTF-8') == 4) ? 'selected' : ''; ?>>Gear</option>
+                                        <option value="5" <?php echo (htmlspecialchars($product['category_id'], ENT_QUOTES, 'UTF-8') == 5) ? 'selected' : ''; ?>>Football Boots</option>
                                     </select>
                                 </div>
 
@@ -138,7 +141,8 @@
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="price" step="0.01" min="0" value="<?php echo $product['price']; ?>" required>
+                                        <!-- Load the current price into the input field -->
+                                        <input type="number" class="form-control" id="price" step="0.01" min="0" value="<?php echo htmlspecialchars($product['price'], ENT_QUOTES, 'UTF-8'); ?>" required>
                                     </div>
                                 </div>
                             </div>
@@ -148,7 +152,8 @@
                                 <label for="productName" class="form-label">
                                     <i class="fas fa-box me-1"></i>Product Name
                                 </label>
-                                <input type="text" class="form-control" id="productName" value="<?php echo htmlspecialchars($product['product_name']); ?>" required>
+                                <!-- Double sanitization here - this was already sanitized in original code but adding extra protection -->
+                                <input type="text" class="form-control" id="productName" value="<?php echo htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8'); ?>" required>
                             </div>
 
                             <!-- Description -->
@@ -156,7 +161,8 @@
                                 <label for="description" class="form-label">
                                     <i class="fas fa-align-left me-1"></i>Description
                                 </label>
-                                <textarea class="form-control" id="description" rows="4" required><?php echo htmlspecialchars($product['description']); ?></textarea>
+                                <!-- Sanitized description to prevent XSS attacks -->
+                                <textarea class="form-control" id="description" rows="4" required><?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></textarea>
                             </div>
 
                             <!-- Action Buttons -->
@@ -164,7 +170,8 @@
                                 <span>
                                     <strong>Last Updated:</strong> 
                                     <span class="text-muted" id="lastUpdated">
-                                        <?php echo date('Y-m-d H:i:s', strtotime($product['updated_at'])); ?>
+                                        <!-- Sanitized timestamp to prevent XSS -->
+                                        <?php echo htmlspecialchars(date('Y-m-d H:i:s', strtotime($product['updated_at'])), ENT_QUOTES, 'UTF-8'); ?>
                                     </span>
                                 </span>
                                 <div class="d-flex gap-3">
@@ -229,7 +236,7 @@
                 
                 if (result.success) {
                     showSuccessAlert(result.message);
-                    //Redirect after success
+                    // Redirect after success
                     setTimeout(() => {
                         window.location.href = 'products.php';
                     }, 6000);
@@ -269,7 +276,7 @@
             const alert = document.getElementById('errorAlert');
             const messageDiv = document.getElementById('errorMessage');
             messageDiv.textContent = message;
-            alert.classList.remove('d-none'); // Removing the hiding class
+            alert.classList.remove('d-none'); // Removed the hiding class
             alert.style.display = 'flex';
             
             // Auto-hide after 5 seconds
@@ -283,8 +290,8 @@
             alert.style.transition = 'opacity 0.7s';
             alert.style.opacity = '0';
             setTimeout(() => {
-                alert.classList.add('d-none'); // Adding the hiding class back
-                //alert.style.display = 'none';
+                alert.classList.add('d-none'); // Added the hiding class back
+                // alert.style.display = 'none';
                 alert.style.opacity = '1';
             }, 500);
         }
@@ -294,8 +301,8 @@
             alert.style.transition = 'opacity 0.7s';
             alert.style.opacity = '0';
             setTimeout(() => {
-                alert.classList.add('d-none'); // Add the hiding class back
-                //alert.style.display = 'none';
+                alert.classList.add('d-none'); // Added the hiding class back
+                // alert.style.display = 'none';
                 alert.style.opacity = '1';
             }, 500);
         }
@@ -307,7 +314,7 @@
             this.style.height = this.scrollHeight + 'px';
         });
         
-        // Initialize with proper height
+        // Initialized with proper height
         textarea.style.height = textarea.scrollHeight + 'px';
     </script>
 

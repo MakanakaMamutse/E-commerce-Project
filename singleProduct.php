@@ -67,9 +67,10 @@ else {
     <div class="row mt-5">
         <?php if($product_data) { ?>
             <div class="col-lg-5 col-md-6 col-sm-12">
+                <!-- Display the main product image with fallback to placeholder if image fails to load -->
                 <img class="img-fluid w-100 pb-1" 
-                     src="assets/<?php echo $product_data['image_url']; ?>" 
-                     alt="Product Image" 
+                     src="assets/<?php echo htmlspecialchars($product_data['image_url'], ENT_QUOTES, 'UTF-8'); ?>" 
+                     alt="<?php echo htmlspecialchars($product_data['product_name'], ENT_QUOTES, 'UTF-8'); ?>" 
                      id="mainImg" 
                      onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
                 
@@ -81,12 +82,11 @@ else {
                     for($i = 0; $i < 4; $i++) { 
                     ?>
                         <div class="small-img-col">
-                            <!-- Each image represents a different angle/view of the current product -->
-                            <!-- Currently using placeholders for demonstration -->
-                            <img src="assets/<?php echo $small_images[$i]; ?>" 
+                            <!-- Show smaller thumbnails of the same product from different angles -->
+                            <img src="assets/<?php echo htmlspecialchars($small_images[$i], ENT_QUOTES, 'UTF-8'); ?>" 
                                  width="100%" 
                                  class="small-img" 
-                                 alt="Product Image - View <?php echo ($i + 1); ?>"
+                                 alt="<?php echo htmlspecialchars($product_data['product_name'], ENT_QUOTES, 'UTF-8'); ?> - View <?php echo ($i + 1); ?>"
                                  title="Click to view this angle"
                                  onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
                         </div>
@@ -95,23 +95,25 @@ else {
             </div>
             
             <div class="col-lg-7 col-md-6 col-sm-12">
-                <h6><?php echo $product_data['category_name']; ?></h6>
-                <h3 class="py-4"><?php echo $product_data['product_name']; ?></h3>
-                <h2>$<?php echo $product_data['price']; ?></h2>
+                <!-- Escaped all display data to prevent XSS injections -->
+                <h6><?php echo htmlspecialchars($product_data['category_name'], ENT_QUOTES, 'UTF-8'); ?></h6>
+                <h3 class="py-4"><?php echo htmlspecialchars($product_data['product_name'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                <h2>$<?php echo htmlspecialchars($product_data['price'], ENT_QUOTES, 'UTF-8'); ?></h2>
                 
-                 <!-- Add to Cart Form -->
+                 <!-- Secured all form values that get passed to cart -->
                 <form id="addToCartForm" method="POST" action="cart.php">
-                    <input type="hidden" name="product_id" value="<?php echo $product_data['product_id']; ?>">
-                    <input type="hidden" name="product_name" value="<?php echo $product_data['product_name']; ?>">
-                    <input type="hidden" name="product_price" value="<?php echo $product_data['price']; ?>">
-                    <input type="hidden" name="product_image" value="<?php echo $product_data['image_url']; ?>">
+                    <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product_data['product_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="product_name" value="<?php echo htmlspecialchars($product_data['product_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="product_price" value="<?php echo htmlspecialchars($product_data['price'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="product_image" value="<?php echo htmlspecialchars($product_data['image_url'], ENT_QUOTES, 'UTF-8'); ?>">
                     
                     <input type="number" name="product_quantity" value="1" min="1" max="10" id="quantity"/>
                     <button type="submit" class="add-to-cart-btn" name="add_to_cart" id="addToCartBtn">Add To Cart</button>
                 </form>
                 
                 <h4 class="mt-5 mb-5">Product Details</h4>
-                <span><?php echo $product_data['description']; ?></span>
+                <!-- Made sure description is safe to display -->
+                <span><?php echo htmlspecialchars($product_data['description'], ENT_QUOTES, 'UTF-8'); ?></span>
 
                 <!-- Seller Information Section -->
                 <div class="seller-info mt-4 p-4 border-0 rounded-3 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-left: 8px solid #007bff !important; max-width: 300px;">
@@ -122,7 +124,13 @@ else {
                         </div>
                         <div class="flex-grow-1">
                             <h6 class="mb-1 text-muted" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Sold by</h6>
-                            <p class="mb-0 fw-bold" style="font-size: 1.1rem; color: #343a40;"><?php $seller_name = (!empty($product_data['seller_name'])) ? $product_data['seller_name'] : 'Individual Seller';echo htmlspecialchars($seller_name, ENT_QUOTES, 'UTF-8'); ?></p>
+                            <p class="mb-0 fw-bold" style="font-size: 1.1rem; color: #343a40;">
+                                <?php 
+                                // Set default seller name and then escaped it for safe display
+                                $seller_name = (!empty($product_data['seller_name'])) ? $product_data['seller_name'] : 'Individual Seller';
+                                echo htmlspecialchars($seller_name, ENT_QUOTES, 'UTF-8'); 
+                                ?>
+                            </p>
                             <small class="text-muted">
                                 <i class="fas fa-shield-alt me-1" style="color: #28a745;"></i>
                                 Verified Seller
@@ -155,7 +163,11 @@ else {
 
           <?php while($row=$products->fetch_assoc()) { ?>
               <div class="product text-center col-lg-3 col-md-6 col-sm-12">
-                <img class="img-fluid mb-3" src="assets/<?php echo $row['image_url']; ?>" alt="<?php echo $row['product_name']; ?>" onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
+                <!-- Escaped all related product data to keep everything secure -->
+                <img class="img-fluid mb-3" 
+                     src="assets/<?php echo htmlspecialchars($row['image_url'], ENT_QUOTES, 'UTF-8'); ?>" 
+                     alt="<?php echo htmlspecialchars($row['product_name'], ENT_QUOTES, 'UTF-8'); ?>" 
+                     onerror="this.onerror=null; this.src='assets/images/Placeholder.png';"/>
                 <div class="star">
                   <i class="fas fa-star"></i>
                   <i class="fas fa-star"></i>
@@ -164,10 +176,11 @@ else {
                   <i class="fas fa-star"></i>
                 </div>
 
-                <h5 class="p-name"><?php echo $row['product_name']; ?></h5>
-                <h4 class="p-price"><?php echo $row['price']; ?></h4>
+                <h5 class="p-name"><?php echo htmlspecialchars($row['product_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
+                <h4 class="p-price">$<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></h4>
                 <p>Simply the best on the market</p>
-                <a href="singleProduct.php?product_id=<?php echo $row['product_id']; ?>" class="buy-btn">Buy Now</a>
+                <!-- Made sure product ID in URL is safe too -->
+                <a href="singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id'], ENT_QUOTES, 'UTF-8'); ?>" class="buy-btn">Buy Now</a>
               </div>
           <?php } ?>
         </div>
