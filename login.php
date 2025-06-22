@@ -108,7 +108,7 @@ session_start();
                       <!-- General error message -->
                       <?php if (isset($errors['general'])): ?>
                           <div class="alert alert-danger" role="alert">
-                              <?php echo htmlspecialchars($errors['general']); ?>
+                              <?php echo htmlspecialchars($errors['general'], ENT_QUOTES, 'UTF-8'); ?>
                           </div>
                       <?php endif; ?>
                       
@@ -119,11 +119,11 @@ session_start();
                                 class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>" 
                                 id="email" 
                                 name="email" 
-                                value="<?php echo isset($form_data['email']) ? htmlspecialchars($form_data['email']) : ''; ?>"
+                                value="<?php echo isset($form_data['email']) ? htmlspecialchars($form_data['email'], ENT_QUOTES, 'UTF-8') : ''; ?>"
                                 required>
                           <?php if (isset($errors['email'])): ?>
                               <div class="invalid-feedback">
-                                  <?php echo htmlspecialchars($errors['email']); ?>
+                                  <?php echo htmlspecialchars($errors['email'], ENT_QUOTES, 'UTF-8'); ?>
                               </div>
                           <?php endif; ?>
                       </div>
@@ -138,7 +138,7 @@ session_start();
                                 required>
                           <?php if (isset($errors['password'])): ?>
                               <div class="invalid-feedback">
-                                  <?php echo htmlspecialchars($errors['password']); ?>
+                                  <?php echo htmlspecialchars($errors['password'], ENT_QUOTES, 'UTF-8'); ?>
                               </div>
                           <?php endif; ?>
                       </div>

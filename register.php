@@ -1,24 +1,24 @@
 <?php
 session_start();
 
-// Include database connection
+// Including database connection file
 include('server/connection.php');
 
-//Stops logged in users from registering again/ accessing the register page
-  if (isset($_SESSION['login_status']) && $_SESSION['login_status'] === true) {
-      // User is already logged in, redirect to account page
-      header("Location: account.php");
-      exit();
-  }
+// Preventing already logged-in users from accessing registration page
+// If someone's already logged in, we redirect them to their account page
+if (isset($_SESSION['login_status']) && $_SESSION['login_status'] === true) {
+    header("Location: account.php");
+    exit();
+}
 
-// Initialize variables for form data and errors
+// Setting up arrays to store form data and validation errors
 $errors = [];
 $form_data = [];
 
-// Check if registration form was submitted - You clicked the register button
+// Checking if the registration form was submitted
 if (isset($_POST['register'])) {
     
-    // Sanitize and store form input
+    // Cleaning up form input by removing extra whitespace
     $form_data['name'] = trim($_POST['name']);
     $form_data['username'] = trim($_POST['username']);
     $form_data['email'] = trim($_POST['email']);
@@ -26,19 +26,19 @@ if (isset($_POST['register'])) {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm-password'];
     
-    // Validate form input
+    // Starting validation process
     
-    // Check if passwords match
+    // Making sure both password fields match
     if ($password !== $confirm_password) {
         $errors['confirm_password'] = "Passwords do not match.";
     }
     
-    // Check password length
+    // Ensuring password meets minimum length requirement
     if (strlen($password) < 8) {
         $errors['password'] = "Password must be at least 8 characters long.";
     }
     
-    // Check if email already exists in database
+    // Checking if email is already registered in our system
     if (empty($errors)) {
         $check_email_sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         $check_stmt = $conn->prepare($check_email_sql);
@@ -53,7 +53,7 @@ if (isset($_POST['register'])) {
         }
     }
     
-    // Check if username already exists in database
+    // Verifying username isn't taken by another user
     if (empty($errors)) {
         $check_username_sql = "SELECT COUNT(*) FROM users WHERE username = ?";
         $check_stmt = $conn->prepare($check_username_sql);
@@ -68,19 +68,19 @@ if (isset($_POST['register'])) {
         }
     }
 
-    // Validate phone number format
+    // Validating phone number format - expecting exactly 10 digits
     if (!preg_match('/^[0-9]{10}$/', $form_data['phone_number'])) {
         $errors['phone_number'] = "Phone number must be 10 digits.";
     }
     
-    // If no validation errors, proceed with registration
+    // Processing registration if all validation passed
     if (empty($errors)) {
         
-        // Hash the password for security
+        // Hashing password for secure storage
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $registration_date = date("Y-m-d H:i:s");
         
-        // Prepare SQL statement to insert new user
+        // Preparing SQL statement to create new user account
         $insert_sql = "INSERT INTO users (full_name, username, email, phone_number, password, registration_date) 
                        VALUES (?, ?, ?, ?, ?, ?)";
         
@@ -94,33 +94,31 @@ if (isset($_POST['register'])) {
             $registration_date
         );
         
-        // Execute the insert statement
+        // Attempting to create the user account
         if ($insert_stmt->execute()) {
             
-            $user_id = $conn->insert_id; // Get the newly created user ID from the database
+            // Getting the newly created user's ID from database
+            $user_id = $conn->insert_id;
 
-            // Assigning default 'customer' role
+            // Assigning default customer role to new user
             $role_sql = "INSERT INTO user_roles (user_id, role_type) VALUES (?, 'customer')";
             $role_stmt = $conn->prepare($role_sql);
             $role_stmt->bind_param("i", $user_id);
             $role_stmt->execute();
             $role_stmt->close();
 
-            
-            // Storung user ID in session
+            // Storing user information in session for automatic login
             $_SESSION['user_id'] = $user_id;
-            
-            // Registration successful - set session variables
             $_SESSION['username'] = $form_data['username'];
             $_SESSION['email'] = $form_data['email'];
             $_SESSION['login_status'] = true;
             
-            // Redirect to account page
+            // Redirecting to account page after successful registration
             header("Location: account.php");
             exit();
             
         } else {
-            // Database error occurred
+            // Handling database insertion errors
             $errors['general'] = "Registration failed. Please try again.";
         }
         
@@ -130,11 +128,10 @@ if (isset($_POST['register'])) {
     $conn->close();
 } 
 
-
 ?>
 
 <?php include('layouts/header.php'); ?>
-      <!--Register-->
+      <!--Registration Form Section-->
     <section class="my-5 py-5">
         <div class="container mt-5 py-5">
             <div class="row">
@@ -143,78 +140,78 @@ if (isset($_POST['register'])) {
                     <hr class="mx-auto">
                     <form action="register.php" method="POST" class="shadow-lg p-4">
                         
-                        <!-- General error message -->
+                        <!-- Displaying general error messages if registration failed -->
                         <?php if (isset($errors['general'])): ?>
                             <div class="alert alert-danger" role="alert">
-                                <?php echo htmlspecialchars($errors['general']); ?>
+                                <?php echo htmlspecialchars($errors['general'], ENT_QUOTES, 'UTF-8'); ?>
                             </div>
                         <?php endif; ?>
                         
-                        <!-- Full Name Field -->
+                        <!-- Full Name Input Field -->
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
                             <input type="text" 
                                   class="form-control <?php echo isset($errors['name']) ? 'is-invalid' : ''; ?>" 
                                   id="name" 
                                   name="name" 
-                                  value="<?php echo isset($form_data['name']) ? htmlspecialchars($form_data['name']) : ''; ?>"
+                                  value="<?php echo isset($form_data['name']) ? htmlspecialchars($form_data['name'], ENT_QUOTES, 'UTF-8') : ''; ?>"
                                   required>
                             <?php if (isset($errors['name'])): ?>
                                 <div class="invalid-feedback">
-                                    <?php echo htmlspecialchars($errors['name']); ?>
+                                    <?php echo htmlspecialchars($errors['name'], ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                         
-                        <!-- Username Field -->
+                        <!-- Username Input Field -->
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" 
                                   class="form-control <?php echo isset($errors['username']) ? 'is-invalid' : ''; ?>" 
                                   id="username" 
                                   name="username" 
-                                  value="<?php echo isset($form_data['username']) ? htmlspecialchars($form_data['username']) : ''; ?>"
+                                  value="<?php echo isset($form_data['username']) ? htmlspecialchars($form_data['username'], ENT_QUOTES, 'UTF-8') : ''; ?>"
                                   required>
                             <?php if (isset($errors['username'])): ?>
                                 <div class="invalid-feedback">
-                                    <?php echo htmlspecialchars($errors['username']); ?>
+                                    <?php echo htmlspecialchars($errors['username'], ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                         
-                        <!-- Email Field -->
+                        <!-- Email Address Input Field -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" 
                                   class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>" 
                                   id="email" 
                                   name="email" 
-                                  value="<?php echo isset($form_data['email']) ? htmlspecialchars($form_data['email']) : ''; ?>"
+                                  value="<?php echo isset($form_data['email']) ? htmlspecialchars($form_data['email'], ENT_QUOTES, 'UTF-8') : ''; ?>"
                                   required>
                             <?php if (isset($errors['email'])): ?>
                                 <div class="invalid-feedback">
-                                    <?php echo htmlspecialchars($errors['email']); ?>
+                                    <?php echo htmlspecialchars($errors['email'], ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                         
-                        <!-- Phone Number Field -->
+                        <!-- Phone Number Input Field -->
                         <div class="mb-3">
                             <label for="phone-number" class="form-label">Phone Number</label>
                             <input type="tel" 
                                   class="form-control <?php echo isset($errors['phone_number']) ? 'is-invalid' : ''; ?>" 
                                   id="phone-number" 
                                   name="phone-number" 
-                                  value="<?php echo isset($form_data['phone_number']) ? htmlspecialchars($form_data['phone_number']) : ''; ?>"
+                                  value="<?php echo isset($form_data['phone_number']) ? htmlspecialchars($form_data['phone_number'], ENT_QUOTES, 'UTF-8') : ''; ?>"
                                   required>
                             <?php if (isset($errors['phone_number'])): ?>
                                 <div class="invalid-feedback">
-                                    <?php echo htmlspecialchars($errors['phone_number']); ?>
+                                    <?php echo htmlspecialchars($errors['phone_number'], ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                         
-                        <!-- Password Field -->
+                        <!-- Password Input Field -->
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" 
@@ -224,13 +221,13 @@ if (isset($_POST['register'])) {
                                   required>
                             <?php if (isset($errors['password'])): ?>
                                 <div class="invalid-feedback">
-                                    <?php echo htmlspecialchars($errors['password']); ?>
+                                    <?php echo htmlspecialchars($errors['password'], ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             <?php endif; ?>
                             <div class="form-text">Password must be at least 8 characters long.</div>
                         </div>
                         
-                        <!-- Confirm Password Field -->
+                        <!-- Password Confirmation Field -->
                         <div class="mb-3">
                             <label for="confirm-password" class="form-label">Confirm Password</label>
                             <input type="password" 
@@ -240,13 +237,14 @@ if (isset($_POST['register'])) {
                                   required>
                             <?php if (isset($errors['confirm_password'])): ?>
                                 <div class="invalid-feedback">
-                                    <?php echo htmlspecialchars($errors['confirm_password']); ?>
+                                    <?php echo htmlspecialchars($errors['confirm_password'], ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             <?php endif; ?>
                         </div>
                         
                         <button type="submit" class="register-btn" id="register-btn" name="register">Register</button>
                         
+                        <!-- Link to login page for existing users -->
                         <div class="mt-3 text-center">
                             <small>Do you have an account? <a href="login.php">Login here</a></small>
                         </div>

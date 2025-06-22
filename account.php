@@ -12,7 +12,7 @@ include('server/connection.php');
 
 // Check if the user is logged in
 if (!isset($_SESSION['login_status'])) {
-    // User is not logged in, redirect to the login page
+    // User isn't logged in, redirect to the login page
     header("Location: login.php");
     exit();
 }
@@ -29,6 +29,7 @@ if (isset($_GET['logout'])) {
         unset($_SESSION['username']);
         unset($_SESSION['useremail']);
         unset($_SESSION['email']);
+        session_destroy(); // Destroy the session to clear all data
 
         // Redirect to login page after logout
         header("Location: login.php");
@@ -108,7 +109,7 @@ if (isset($_POST['change-password'])) {
         $errors['new_password'] = "Password must be at least 8 characters long.";
     }
     
-    // Check for password complexity (at least one number and one letter)
+    // Check for password complexity - at least one number and one letter
     if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d)/', $new_password)) {
         $errors['new_password'] = "Password must contain at least one letter and one number.";
     }
@@ -159,6 +160,8 @@ if (isset($_POST['change-password'])) {
 }
 
 // Check if the user is logged in and then retrieve order history
+$orders = null;
+$total_orders_cost = 0; // Initialize total cost for all orders
 if (isset($_SESSION['login_status'])) {
     // Prepare SQL statement to fetch user orders
     $customer_id = $_SESSION['user_id'];
@@ -173,6 +176,13 @@ if (isset($_SESSION['login_status'])) {
         
         // Fetch results
         $orders = $stmt->get_result();
+        
+        // Calculate total cost of all orders while preserving the result set
+        $orders_array = [];
+        while ($row = $orders->fetch_assoc()) {
+            $orders_array[] = $row;
+            $total_orders_cost += $row['total_amount']; // Adding each order's total to the grand total
+        }
         
         // Close the statement
         $stmt->close();
@@ -200,10 +210,10 @@ if (isset($_SESSION['login_status'])) {
                   <h3>Account Info</h3>
                   <hr class="mx-auto">
                   <div class="account-info">
-                      <p>Name: <span> <?php echo htmlspecialchars($_SESSION['username']); ?> </span></p>
-                      <p>Email: <span> <?php echo htmlspecialchars($_SESSION['email']); ?> </span></p>
+                      <p>Name: <span> <?php echo htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8'); ?> </span></p>
+                      <p>Email: <span> <?php echo htmlspecialchars($_SESSION['email'], ENT_QUOTES, 'UTF-8'); ?> </span></p>
                       <p>Role: <span class="badge bg-<?php echo ($user_role === 'admin') ? 'danger' : (($user_role === 'seller') ? 'warning' : 'secondary'); ?>">
-                          <?php echo ucfirst($user_role); ?>
+                          <?php echo ucfirst(htmlspecialchars($user_role, ENT_QUOTES, 'UTF-8')); ?>
                       </span></p>
                       
                       <?php if ($user_role === 'seller' || $user_role === 'admin'): ?>
@@ -217,7 +227,7 @@ if (isset($_SESSION['login_status'])) {
                   </div>
               </div>
               
-              <!-- Seller Upgrade Section (in the white space) -->
+              <!-- Seller Upgrade Section - only showing for customers -->
               <?php if ($user_role === 'customer'): ?>
               <div class="mt-4">
                   <div class="card">
@@ -232,7 +242,7 @@ if (isset($_SESSION['login_status'])) {
                           <!-- Upgrade Error Message Display -->
                           <?php if (isset($errors['upgrade'])): ?>
                               <div class="alert alert-danger" role="alert">
-                                  <strong>Error:</strong> <?php echo htmlspecialchars($errors['upgrade']); ?>
+                                  <strong>Error:</strong> <?php echo htmlspecialchars($errors['upgrade'], ENT_QUOTES, 'UTF-8'); ?>
                               </div>
                           <?php endif; ?>
                           
@@ -264,14 +274,14 @@ if (isset($_SESSION['login_status'])) {
               <!-- Success Message Display -->
               <?php if (!empty($success_message)): ?>
                   <div class="alert alert-success text-center" role="alert">
-                      <strong>Success!</strong> <?php echo htmlspecialchars($success_message); ?>
+                      <strong>Success!</strong> <?php echo htmlspecialchars($success_message, ENT_QUOTES, 'UTF-8'); ?>
                   </div>
               <?php endif; ?>
               
               <!-- General Error Message Display -->
               <?php if (isset($errors['general'])): ?>
                   <div class="alert alert-danger text-center" role="alert">
-                      <strong>Error:</strong> <?php echo htmlspecialchars($errors['general']); ?>
+                      <strong>Error:</strong> <?php echo htmlspecialchars($errors['general'], ENT_QUOTES, 'UTF-8'); ?>
                   </div>
               <?php endif; ?>
               
@@ -291,7 +301,7 @@ if (isset($_SESSION['login_status'])) {
                             required>
                       <?php if (isset($errors['new_password'])): ?>
                           <div class="invalid-feedback">
-                              <?php echo htmlspecialchars($errors['new_password']); ?>
+                              <?php echo htmlspecialchars($errors['new_password'], ENT_QUOTES, 'UTF-8'); ?>
                           </div>
                       <?php endif; ?>
                       <div class="form-text">
@@ -310,7 +320,7 @@ if (isset($_SESSION['login_status'])) {
                             required>
                       <?php if (isset($errors['confirm_password'])): ?>
                           <div class="invalid-feedback">
-                              <?php echo htmlspecialchars($errors['confirm_password']); ?>
+                              <?php echo htmlspecialchars($errors['confirm_password'], ENT_QUOTES, 'UTF-8'); ?>
                           </div>
                       <?php endif; ?>
                   </div>
@@ -344,33 +354,40 @@ if (isset($_SESSION['login_status'])) {
                 <th>Order Cost</th>
             </tr>
 
-            <?php while ($row = $orders->fetch_assoc()) { ?>
+            <?php 
+            // Display orders if we have any
+            if (!empty($orders_array)) {
+                foreach ($orders_array as $row) { ?>
                 <tr>
                     <td>
                         <div class="product-info">
-                          <img src="assets\images\OrderID.png" alt="Product Image">
+                          <img src="assets/images/OrderID.png" alt="Order Image">
                           <div class="font-weight-bold">
                               <br>
-                              <p> <?php echo $row['order_id']; ?> </p>
-                              <a href="order_details.php?order_id=<?php echo htmlspecialchars($row['order_id']); ?>">Details</a>
+                              <p> <?php echo htmlspecialchars($row['order_id'], ENT_QUOTES, 'UTF-8'); ?> </p>
+                              <a href="order_details.php?order_id=<?php echo htmlspecialchars($row['order_id'], ENT_QUOTES, 'UTF-8'); ?>">Details</a>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <span class="order-date"> <?php echo $row['order_status']; ?> </span>
+                      <span class="order-date"> <?php echo htmlspecialchars($row['order_status'], ENT_QUOTES, 'UTF-8'); ?> </span>
                     </td>
                     <td>
-                      <span class="order-date"> <?php echo $row['order_date']; ?> </span>
+                      <span class="order-date"> <?php echo htmlspecialchars($row['order_date'], ENT_QUOTES, 'UTF-8'); ?> </span>
                     </td>
                     <td>
                       <input type="number" value="1" min="1">
                       <a class="edit-btn" href="#">Edit</a>
                     </td>
                     <td>
-                      <span class="product-price">$<?php echo $row['total_amount']; ?></span>
+                      <span class="product-price">$<?php echo htmlspecialchars(number_format($row['total_amount'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
                     </td>
                 </tr>
-
+                <?php }
+            } else { ?>
+                <tr>
+                    <td colspan="5" class="text-center">No orders found</td>
+                </tr>
             <?php } ?>
 
         </table>
@@ -378,19 +395,16 @@ if (isset($_SESSION['login_status'])) {
         <div class="cart-total">
           <table>
             <tr>
-              <td>Subtotal</td>
-              <td>R150.00</td>
+              <td>Total Cost of Orders:</td>
+              <td>$<?php echo htmlspecialchars(number_format($total_orders_cost, 2), ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
-            <tr>
+            <!-- <tr>
               <td>Shipping</td>
-              <td>R50.00</td>
+              <td>$50.00</td>
+            </tr> -->
           </table>
         </div>
 
-        <div class="checkout-container">
-          <button class="checkout-btn">Checkout</button>
-
-        </div>
   </section>
 
 <?php include('layouts/footer.html'); ?>
