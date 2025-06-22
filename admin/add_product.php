@@ -383,7 +383,7 @@ $conn->close();
                                 <!-- XSS Protection: Preserving user input in textarea while preventing script execution -->
                                 <textarea class="form-control" id="productDescription" name="product_description" 
                                           rows="4" placeholder="Enter product description" maxlength="1000"><?php 
-                                    echo isset($_POST['product_description']) ? htmlspecialchars($_POST['product_description'], ENT_QUOTES, 'UTF-8') : ''; 
+                                    echo isset($_POST['product_description']) ? htmlspecialchars($_POST['product_description'], ENT_NOQUOTES, 'UTF-8') : ''; 
                                 ?></textarea>
                             </div>
                         </div>

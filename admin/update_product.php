@@ -64,7 +64,7 @@ try {
      
     // Escaping HTML special characters to prevent XSS attacks - this is crucial for security
     $safeProductName = htmlspecialchars($productName, ENT_QUOTES, 'UTF-8');
-    $safeDescription = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+    $safeDescription = htmlspecialchars($description, ENT_NOQUOTES, 'UTF-8');
      
     // Binding our cleaned parameters to the query (i = integer, s = string, d = double/float) 
     $stmt->bind_param("issdi", $categoryId, $safeProductName, $safeDescription, $price, $productId); 
