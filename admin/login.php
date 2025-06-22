@@ -4,16 +4,47 @@
   include('../server/connection.php');
 session_start();
 
-  //If the Admin is already logged in, redirect them to the admin dashboard
-  // This prevents unauthorized access to the login page, else seller must re-login
-  if (isset($_SESSION['login_status']) && $_SESSION['login_status'] === true && $_SESSION['user_id'] == 1) {
-      // User is already logged in, redirect to admin page 
-      // Add sql logic for when admin is logged int else accoutn page breaks
-      //////////////
-      $_SESSION['role_type'] = 'admin';
-      header("Location: admin_dashboard.php");
-      exit();
-  }
+  // If the Admin is already logged in, redirect them to the admin dashboard
+// This prevents unauthorized access to the login page, else seller must re-login
+if (isset($_SESSION['login_status']) && $_SESSION['login_status'] === true && $_SESSION['user_id'] == 1) {
+
+    // Admin is already logged in, but we need to ensure all session variables are set
+    // Check if critical session variables are missing
+    if (!isset($_SESSION['full_name']) || !isset($_SESSION['username']) || !isset($_SESSION['email']) || 
+        !isset($_SESSION['phone_number']) || !isset($_SESSION['registration_date']) || !isset($_SESSION['role_type'])) {
+        
+        // Fetch complete user data from database to populate missing session variables
+        $user_sql = "SELECT u.*, ur.role_type
+                     FROM users u 
+                     LEFT JOIN user_roles ur ON u.user_id = ur.user_id 
+                     WHERE u.user_id = ? LIMIT 1";
+        
+        $stmt = $conn->prepare($user_sql);
+        $stmt->bind_param("i", $_SESSION['user_id']);
+        
+        if ($stmt->execute()) {
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows == 1) {
+                $user = $result->fetch_assoc();
+                
+                // Set all required session variables
+                $_SESSION['full_name'] = $user['full_name'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['phone_number'] = $user['phone_number'];
+                $_SESSION['registration_date'] = $user['registration_date'];
+                $_SESSION['role_type'] = $user['role_type'];
+            }
+        }
+        
+        $stmt->close();
+    }
+    
+    // Now redirecting to admin dashboard with all session variables properly set
+    header("Location: admin_dashboard.php");
+    exit();
+}
 
   // Initialize arrays to store form data and error messages
   $errors = [];
