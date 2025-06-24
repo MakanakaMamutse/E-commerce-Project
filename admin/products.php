@@ -382,7 +382,7 @@ if (isset($_GET['logout'])) {
                                         <td>
                                             <span class="badge bg-success"><?php echo htmlspecialchars($product['seller_name'] ?? 'Unknown Seller'); ?></span>
                                         </td>
-                                        <td><strong>$<?php echo number_format($product['price'], 2); ?></strong></td>
+                                        <td><strong>R<?php echo number_format($product['price'], 2); ?></strong></td>
 
                                         <td>
                                             <div class="btn-group btn-group-sm">

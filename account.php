@@ -380,7 +380,7 @@ if (isset($_SESSION['login_status'])) {
                       <a class="edit-btn" href="#">Edit</a>
                     </td>
                     <td>
-                      <span class="product-price">$<?php echo htmlspecialchars(number_format($row['total_amount'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
+                      <span class="product-price">R<?php echo htmlspecialchars(number_format($row['total_amount'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
                     </td>
                 </tr>
                 <?php }
@@ -396,7 +396,7 @@ if (isset($_SESSION['login_status'])) {
           <table>
             <tr>
               <td>Total Cost of Orders:</td>
-              <td>$<?php echo htmlspecialchars(number_format($total_orders_cost, 2), ENT_QUOTES, 'UTF-8'); ?></td>
+              <td>R<?php echo htmlspecialchars(number_format($total_orders_cost, 2), ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
             <!-- <tr>
               <td>Shipping</td>

@@ -52,7 +52,7 @@ $order_status = isset($_GET['order_status']) ? htmlspecialchars($_GET['order_sta
                 <!-- Displaying current order status safely -->
                 <p>Your order is currently <?php echo $order_status; ?>, proceed below</p>
                 <!-- Showing formatted total cost with proper escaping -->
-                <p><?php echo "Total payment is: $" . htmlspecialchars(number_format($total_cost, 2), ENT_QUOTES, 'UTF-8'); ?> (incl. Shipping)</p>
+                <p><?php echo "Total payment is: R" . htmlspecialchars(number_format($total_cost, 2), ENT_QUOTES, 'UTF-8'); ?> (incl. Shipping)</p>
                 <button type="submit">Pay Now</button>
             </div>
         </div>

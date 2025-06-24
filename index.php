@@ -120,7 +120,7 @@
           </div>
 
           <h5 class="p-name mt-1"><?php echo htmlspecialchars($row['product_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
-          <h4 class="p-price">$<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></h4>
+          <h4 class="p-price">R<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></h4>
           <p>Get the best shirts on the market</p>
           <a href="singleProduct.php?product_id=<?php echo (int)$row['product_id']; ?>" class="buy-btn">Buy Now</a>
         </div>
@@ -197,7 +197,7 @@
                 <i class="fas fa-star"></i>
               </div>
               <h5 class="p-name"><?php echo htmlspecialchars($row['product_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
-              <h4 class="p-price">$ <?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></h4>
+              <h4 class="p-price">R <?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></h4>
               <p>Get the best shirts on the market</p>
               <a href="singleProduct.php?product_id=<?php echo (int)$row['product_id']; ?>" class="buy-btn">Buy Now</a>
             </div>

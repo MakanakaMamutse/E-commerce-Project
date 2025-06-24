@@ -182,7 +182,7 @@ function getCartTotal() {
                           onerror="this.onerror=null; this.src='assets/images/Placeholder.png';">
                           <div>
                               <p><?php echo htmlspecialchars($value['product_name'], ENT_QUOTES, 'UTF-8'); ?></p>
-                              <small>Price: $<?php echo htmlspecialchars(number_format($value['product_price'], 2), ENT_QUOTES, 'UTF-8'); ?></small><br>
+                              <small>Price: R<?php echo htmlspecialchars(number_format($value['product_price'], 2), ENT_QUOTES, 'UTF-8'); ?></small><br>
 
                               <!-- Form for removing individual products from cart -->
                               <form method="POST" action="cart.php">
@@ -204,7 +204,7 @@ function getCartTotal() {
 
                   <!-- Calculated line total for this product -->
                   <td>
-                    <span class="product-price">$<?php echo htmlspecialchars(number_format($value['product_price'] * $value['product_quantity'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
+                    <span class="product-price">R<?php echo htmlspecialchars(number_format($value['product_price'] * $value['product_quantity'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
                   </td>
               </tr>
 
@@ -217,11 +217,11 @@ function getCartTotal() {
             <table>
               <tr>
                 <td>Subtotal</td>
-                <td>$<?php echo htmlspecialchars(number_format($_SESSION['cart_total'], 2), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td>R<?php echo htmlspecialchars(number_format($_SESSION['cart_total'], 2), ENT_QUOTES, 'UTF-8'); ?></td>
               </tr>
               <tr>
                 <td>Shipping</td>
-                <td>$<?php echo htmlspecialchars(number_format($_SESSION['cart_total'] * 0.0825, 2), ENT_QUOTES, 'UTF-8'); ?></td>  
+                <td>R<?php echo htmlspecialchars(number_format($_SESSION['cart_total'] * 0.0825, 2), ENT_QUOTES, 'UTF-8'); ?></td>  
               </tr>
             </table>
           </div>

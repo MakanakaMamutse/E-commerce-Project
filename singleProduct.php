@@ -98,7 +98,7 @@ else {
                 <!-- Escaped all display data to prevent XSS injections -->
                 <h6><?php echo htmlspecialchars($product_data['category_name'], ENT_QUOTES, 'UTF-8'); ?></h6>
                 <h3 class="py-4"><?php echo htmlspecialchars($product_data['product_name'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                <h2>$<?php echo htmlspecialchars($product_data['price'], ENT_QUOTES, 'UTF-8'); ?></h2>
+                <h2>R<?php echo htmlspecialchars($product_data['price'], ENT_QUOTES, 'UTF-8'); ?></h2>
                 
                  <!-- Secured all form values that get passed to cart -->
                 <form id="addToCartForm" method="POST" action="cart.php">
@@ -177,7 +177,7 @@ else {
                 </div>
 
                 <h5 class="p-name"><?php echo htmlspecialchars($row['product_name'], ENT_QUOTES, 'UTF-8'); ?></h5>
-                <h4 class="p-price">$<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></h4>
+                <h4 class="p-price">R<?php echo htmlspecialchars($row['price'], ENT_QUOTES, 'UTF-8'); ?></h4>
                 <p>Simply the best on the market</p>
                 <!-- Made sure product ID in URL is safe too -->
                 <a href="singleProduct.php?product_id=<?php echo htmlspecialchars($row['product_id'], ENT_QUOTES, 'UTF-8'); ?>" class="buy-btn">Buy Now</a>

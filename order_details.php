@@ -97,7 +97,7 @@
                                 <!-- Product name with XSS protection -->
                                 <p><?php echo htmlspecialchars($item['product_name'], ENT_QUOTES, 'UTF-8'); ?></p>
                                 <!-- Price at time of purchase, formatted for currency display -->
-                                <small>Price: $<?php echo htmlspecialchars(number_format($item['price_at_purchase'], 2), ENT_QUOTES, 'UTF-8'); ?></small><br>
+                                <small>Price: R<?php echo htmlspecialchars(number_format($item['price_at_purchase'], 2), ENT_QUOTES, 'UTF-8'); ?></small><br>
                             </div>
                         </div>
                     </td>
@@ -107,11 +107,11 @@
                     </td>
                     <td>
                         <!-- Individual item price at time of purchase -->
-                        <span class="price-at-purchase">$<?php echo htmlspecialchars(number_format($item['price_at_purchase'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
+                        <span class="price-at-purchase">R<?php echo htmlspecialchars(number_format($item['price_at_purchase'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
                     </td>
                     <td>
                         <!-- Total cost for this line item (quantity × price) -->
-                        <span class="item-total-price">$<?php echo htmlspecialchars(number_format($item['item_subtotal'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
+                        <span class="item-total-price">R<?php echo htmlspecialchars(number_format($item['item_subtotal'], 2), ENT_QUOTES, 'UTF-8'); ?></span>
                     </td>
                 </tr>
             <?php }

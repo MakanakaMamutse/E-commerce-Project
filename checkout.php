@@ -89,7 +89,7 @@ else {
                             <h4 class="card-title text-center fw-bold">Order Summary</h4>
                             <div class="d-flex justify-content-between fw-bold">
                                 <span>Total Amount:</span>
-                                <span id="order_total" class="fw-bold fs-5">$<?php echo isset($_SESSION['cart_total']) ? htmlspecialchars(number_format($_SESSION['cart_total'], 2), ENT_QUOTES, 'UTF-8') : '0.00'; ?></span>
+                                <span id="order_total" class="fw-bold fs-5">R<?php echo isset($_SESSION['cart_total']) ? htmlspecialchars(number_format($_SESSION['cart_total'], 2), ENT_QUOTES, 'UTF-8') : '0.00'; ?></span>
                             </div>
                         </div>
                     </div>
