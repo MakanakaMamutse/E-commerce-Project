@@ -4,6 +4,9 @@ A specialized customer-to-customer e-commerce platform designed exclusively for 
 
 **Final Year Bachelor's Degree Project | ITECA3-B12**
 
+<img width="1904" height="958" alt="image" src="https://github.com/user-attachments/assets/aa8c2a32-fe2b-442a-ab98-e802c2a99360" />
+
+
 ## 🎯 Project Overview
 
 This capstone project was developed as part of my final year Bachelor's degree in Computer Science/Information Technology, focusing on comprehensive web development and database-driven e-commerce solutions. Rather than building a generic marketplace, I chose to create a niche platform that serves the soccer community with specialized features and targeted user experience.
