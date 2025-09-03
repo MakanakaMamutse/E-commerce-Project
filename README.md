@@ -135,6 +135,9 @@ The platform leverages **Bootstrap 5's responsive framework** and is fully optim
 - **Card Components** - Product displays using Bootstrap card layouts
 - **Button Groups** - Consistent button styling and states
 
+![MixCollage-03-Sep-2025-02-22-AM-885](https://github.com/user-attachments/assets/4cd59e14-f272-4443-b3bd-82d6c1165087)
+
+
 ## 🎓 Academic Learning Outcomes
 
 This capstone project demonstrates mastery of final-year university-level competencies:
